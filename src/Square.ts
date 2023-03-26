@@ -2,6 +2,7 @@ import Piece from './Pieces/Piece';
 
 export default class Square {
     position: number[];
+    piece!: Piece;
     isWhite: boolean;
     column: string;
     row: number;
@@ -16,5 +17,9 @@ export default class Square {
     public fromPositionToColumn(positionX: number): string {
         const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
         return letters[positionX];
+    }
+
+    public setPieceOnTile(piece: Piece) {
+        this.piece = piece;
     }
 }
