@@ -12,6 +12,7 @@ export default function Home() {
             </Head>
             <main className={styles.main}>
                 <h1 className="text-3xl font-bold underline">Alice chess: a chess variant</h1>
+                <Board />
             </main>
         </>
     );
