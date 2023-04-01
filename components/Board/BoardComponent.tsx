@@ -1,11 +1,13 @@
 import { DragDropContext } from 'react-beautiful-dnd';
-import Game from '@/src/Game';
 import Square from '@/src/Square';
-import styles from '@/styles/board.module.css';
-import TileComponent from './TileComponent';
-import { fromPositionToCoordniate } from '@/src/Utils';
+import styles from './board.module.css';
+import TileComponent from '../Tile/TileComponent';
+import { useGameContext } from '@/context/GameContext';
+import { fromCoordinatesToPosition } from '@/src/Utils';
 
 export default function BoardComponent() {
+    const { game } = useGameContext();
+
     const onDragEnd = (result: any) => {
         const { source, destination } = result;
 
@@ -13,10 +15,12 @@ export default function BoardComponent() {
         if (!destination) {
             return;
         }
-        const sInd = source.droppableId;
-        const dInd = destination.droppableId;
+        const positionSource = fromCoordinatesToPosition(source.droppableId);
+        const positionDestination = fromCoordinatesToPosition(destination.droppableId);
+
+        game.executeMove(positionSource, positionDestination);
     };
-    const game: Game = new Game();
+
     return (
         <table className={styles.board}>
             <DragDropContext onDragEnd={onDragEnd}>

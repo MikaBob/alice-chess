@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import styles from '@/styles/index.module.css';
-import BoardComponent from '@/components/BoardComponent';
+import BoardComponent from '@/components/Board/BoardComponent';
 
 export default function Home() {
     return (

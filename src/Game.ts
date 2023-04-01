@@ -2,12 +2,14 @@ import { Bishop } from './Pieces/Bishop';
 import { King } from './Pieces/King';
 import { Knight } from './Pieces/Knight';
 import { Pawn } from './Pieces/Pawn';
+import Piece from './Pieces/Piece';
 import { Queen } from './Pieces/Queen';
 import { Tower } from './Pieces/Tower';
 import Square from './Square';
 
 export default class Game {
     board: Square[][];
+    isWhiteTurnToPlay: boolean;
 
     constructor() {
         this.board = [];
@@ -21,6 +23,7 @@ export default class Game {
             isWhiteTile++; // alternate at each rows
         }
         this.initChessSet();
+        this.isWhiteTurnToPlay = true;
     }
 
     public initChessSet() {
@@ -57,5 +60,18 @@ export default class Game {
         for (let i = 0; i < 8; i++) {
             this.board[6][i].piece = new Pawn([6, i], true);
         }
+    }
+
+    public executeMove(positionFrom: number[], positionTo: number[]) {
+        const pieceMoved: Piece | null = this.board[positionFrom[0]][positionFrom[1]].piece;
+        console.log('before', positionFrom, this.board[positionFrom[0]][positionFrom[1]], positionTo, this.board[positionTo[0]][positionTo[1]], pieceMoved, this.isWhiteTurnToPlay);
+
+        if (pieceMoved !== null && pieceMoved.isWhite === this.isWhiteTurnToPlay) {
+            this.board[positionTo[0]][positionTo[1]].setPieceOnTile(pieceMoved);
+            this.board[positionFrom[0]][positionFrom[1]].setPieceOnTile(null);
+
+            this.isWhiteTurnToPlay = !this.isWhiteTurnToPlay;
+        }
+        console.log('after', positionFrom, this.board[positionFrom[0]][positionFrom[1]], positionTo, this.board[positionTo[0]][positionTo[1]], pieceMoved, this.isWhiteTurnToPlay);
     }
 }
