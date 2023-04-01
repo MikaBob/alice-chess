@@ -1,10 +1,10 @@
-import { Pawn } from './Pieces/Pawn';
-import { Tower } from './Pieces/Tower';
-import { Knight } from './Pieces/Knight';
-import Square from './Square';
 import { Bishop } from './Pieces/Bishop';
-import { Queen } from './Pieces/Queen';
 import { King } from './Pieces/King';
+import { Knight } from './Pieces/Knight';
+import { Pawn } from './Pieces/Pawn';
+import { Queen } from './Pieces/Queen';
+import { Tower } from './Pieces/Tower';
+import Square from './Square';
 
 export default class Game {
     board: Square[][];
@@ -55,7 +55,7 @@ export default class Game {
         this.board[7][4].piece = new King([7, 4], true);
 
         for (let i = 0; i < 8; i++) {
-            this.board[6][i].piece = new Pawn([1, i], true);
+            this.board[6][i].piece = new Pawn([6, i], true);
         }
     }
 }

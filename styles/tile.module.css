@@ -6,10 +6,3 @@
     width: 100px;
     height: 100px;
 }
-
-.piece {
-    position: absolute;
-    width: 100px;
-    height: 100px;
-    top: 0;
-}
