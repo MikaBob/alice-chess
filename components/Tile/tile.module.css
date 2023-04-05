@@ -6,3 +6,21 @@
     width: 100px;
     height: 100px;
 }
+
+.pieceDraggedOver:before {
+    position: absolute;
+    content: '';
+    background: #1a14ca8c;
+    width: 100px;
+    height: 100px;
+    pointer-events: none;
+}
+
+.pieceOriginalTile:before {
+    position: absolute;
+    content: '';
+    background: #caa3148c;
+    width: 100px;
+    height: 100px;
+    pointer-events: none;
+}
