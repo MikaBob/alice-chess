@@ -5,26 +5,30 @@ import styles from './tile.module.css';
 import { fromCoordinatesToPosition, fromPositionToCoordinates } from '@/src/Utils';
 import { useState } from 'react';
 import Piece from '@/src/Pieces/Piece';
-import Game from '@/src/Game';
+import { useGameContext } from '@/context/GameContext';
 
 interface TileProps {
     square: Square;
-    game: Game;
 }
 
 let draggedPiece: Piece | null = null;
-export default function TileComponent({ square, game }: TileProps) {
+export default function TileComponent({ square }: TileProps) {
+    const { game } = useGameContext();
     const coordinates: string = fromPositionToCoordinates(square.position);
     const tileColor: string = square.isWhite ? 'white' : 'black';
     const [cssClasses, setCssClasses] = useState(styles.tile);
 
     function pieceDragStart(e: React.DragEvent<HTMLDivElement>) {
-        const targetCoordinates: string = e.target.dataset.coordinates;
-        const targetPosition: number[] = fromCoordinatesToPosition(targetCoordinates);
-        const piece: Piece | null = game.board[targetPosition[0]][targetPosition[1]].piece;
-        if (piece !== null) {
-            draggedPiece = piece;
-            setCssClasses(styles.tile + ' ' + styles.pieceDraggedOver + ' ' + styles.pieceOriginalTile);
+        if (e !== null && e.target instanceof HTMLElement) {
+            const targetCoordinates: string | undefined = e.target.dataset.coordinates;
+            if (targetCoordinates !== undefined) {
+                const targetPosition: number[] = fromCoordinatesToPosition(targetCoordinates);
+                const piece: Piece | null = game.board[targetPosition[0]][targetPosition[1]].piece;
+                if (piece !== null) {
+                    draggedPiece = piece;
+                    setCssClasses(styles.tile + ' ' + styles.pieceDraggedOver + ' ' + styles.pieceOriginalTile);
+                }
+            }
         }
         //console.log('pieceDragStart', draggedPiece);
     }
@@ -36,9 +40,15 @@ export default function TileComponent({ square, game }: TileProps) {
     }
 
     function piecedropped(e: any) {
+        //console.log('pieceDragEnd', draggedPiece);
         const targetCoordinates: string = e.target.dataset.coordinates;
         setCssClasses(styles.tile);
-        //console.log('dropped', targetCoordinates);
+
+        if (draggedPiece !== null) {
+            //console.log('dropped', draggedPiece.position, fromCoordinatesToPosition(targetCoordinates));
+            game.executeMove(draggedPiece.position, fromCoordinatesToPosition(targetCoordinates));
+            console.log((game.isWhiteTurnToPlay ? 'White' : 'Black') + ' turn to play');
+        }
     }
 
     function tileDragEnter(e: React.DragEvent<HTMLDivElement>) {
@@ -50,8 +60,12 @@ export default function TileComponent({ square, game }: TileProps) {
 
     function tileDragLeave(e: React.DragEvent<HTMLDivElement>) {
         //console.log('tileDragLeave', draggedPiece);
-        const targetCoordinates: string = e.target.dataset.coordinates;
-        if (draggedPiece !== null && fromPositionToCoordinates(draggedPiece.position) !== targetCoordinates) setCssClasses(styles.tile);
+        if (e !== null && e.target instanceof HTMLElement) {
+            const targetCoordinates: string | undefined = e.target.dataset.coordinates;
+            if (targetCoordinates !== undefined) {
+                if (draggedPiece !== null && fromPositionToCoordinates(draggedPiece.position) !== targetCoordinates) setCssClasses(styles.tile);
+            }
+        }
     }
 
     function onDragOver(e: any) {

@@ -1,13 +1,13 @@
 import Square from '@/src/Square';
 import styles from './board.module.css';
 import TileComponent from '../Tile/TileComponent';
-import Game from '@/src/Game';
+import { useGameContext } from '@/context/GameContext';
 
-interface BoardProps {
-    game: Game;
-}
+interface BoardProps {}
 
-export default function BoardComponent({ game }: BoardProps) {
+export default function BoardComponent({}: BoardProps) {
+    const { game } = useGameContext();
+
     return (
         <table className={styles.board}>
             <tbody>
@@ -15,7 +15,7 @@ export default function BoardComponent({ game }: BoardProps) {
                     return (
                         <tr key={index} className={styles.row}>
                             {squares.map((square: Square, index2: number) => {
-                                return <TileComponent key={index2} square={square} game={game} />;
+                                return <TileComponent key={index2} square={square} />;
                             })}
                         </tr>
                     );

@@ -1,15 +1,10 @@
 import Head from 'next/head';
 import styles from '@/styles/index.module.css';
 import BoardComponent from '@/components/Board/BoardComponent';
-import Game from '@/src/Game';
 
-interface HomeProps {
-    gameInJson: string;
-}
+interface HomeProps {}
 
-export default function Home({ gameInJson }: HomeProps) {
-    const game: Game = JSON.parse(gameInJson);
-
+export default function Home({}: HomeProps) {
     return (
         <>
             <Head>
@@ -19,17 +14,8 @@ export default function Home({ gameInJson }: HomeProps) {
             </Head>
             <main className={styles.main}>
                 <h1 className="text-3xl font-bold underline">Alice chess: a chess variant</h1>
-                <BoardComponent game={game} />
+                <BoardComponent />
             </main>
         </>
     );
-}
-
-export async function getStaticProps() {
-    const game = new Game();
-    return {
-        props: {
-            gameInJson: JSON.stringify(game),
-        },
-    };
 }
