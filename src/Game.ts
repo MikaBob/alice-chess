@@ -9,15 +9,19 @@ import Square from './Square';
 
 export default class Game {
     board: Square[][];
+    secondBoard: Square[][];
     isWhiteTurnToPlay: boolean;
 
     constructor() {
         this.board = [];
+        this.secondBoard = [];
         let isWhiteTile = 0;
         for (let i = 0; i < 8; i++) {
             this.board[i] = [];
+            this.secondBoard[i] = [];
             for (let j = 0; j < 8; j++) {
                 this.board[i][j] = new Square(i, j, isWhiteTile % 2 === 0);
+                this.secondBoard[i][j] = new Square(i, j, isWhiteTile % 2 === 0);
                 isWhiteTile++;
             }
             isWhiteTile++; // alternate at each rows
@@ -64,7 +68,7 @@ export default class Game {
 
     public executeMove(positionFrom: number[], positionTo: number[]) {
         const pieceMoved: Piece | null = this.board[positionFrom[0]][positionFrom[1]].piece;
-        console.log('before', positionFrom, this.board[positionFrom[0]][positionFrom[1]], positionTo, this.board[positionTo[0]][positionTo[1]], pieceMoved, this.isWhiteTurnToPlay);
+        //console.log('before', positionFrom, this.board[positionFrom[0]][positionFrom[1]], positionTo, this.board[positionTo[0]][positionTo[1]], pieceMoved, this.isWhiteTurnToPlay);
 
         if (pieceMoved !== null && pieceMoved.isWhite === this.isWhiteTurnToPlay) {
             this.board[positionTo[0]][positionTo[1]].setPieceOnTile(pieceMoved);
@@ -72,6 +76,6 @@ export default class Game {
 
             this.isWhiteTurnToPlay = !this.isWhiteTurnToPlay;
         }
-        console.log('after', positionFrom, this.board[positionFrom[0]][positionFrom[1]], positionTo, this.board[positionTo[0]][positionTo[1]], pieceMoved, this.isWhiteTurnToPlay);
+        //console.log('after', positionFrom, this.board[positionFrom[0]][positionFrom[1]], positionTo, this.board[positionTo[0]][positionTo[1]], pieceMoved, this.isWhiteTurnToPlay);
     }
 }

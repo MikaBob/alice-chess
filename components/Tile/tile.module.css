@@ -3,16 +3,16 @@
 }
 
 .tileBackground {
-    width: 100px;
-    height: 100px;
+    width: var(--tile-width);
+    height: var(--tile-width);
 }
 
 .pieceDraggedOver:before {
     position: absolute;
     content: '';
     background: #1a14ca8c;
-    width: 100px;
-    height: 100px;
+    width: var(--tile-width);
+    height: var(--tile-width);
     pointer-events: none;
 }
 
@@ -20,7 +20,7 @@
     position: absolute;
     content: '';
     background: #caa3148c;
-    width: 100px;
-    height: 100px;
+    width: var(--tile-width);
+    height: var(--tile-width);
     pointer-events: none;
 }

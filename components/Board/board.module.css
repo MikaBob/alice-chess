@@ -1,3 +1,4 @@
 .board {
-    width: 800px;
+    width: calc(var(--tile-width) * 8);
+    height: calc(var(--tile-width) * 8);
 }

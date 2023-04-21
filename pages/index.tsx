@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import styles from '@/styles/index.module.css';
+import styles from './index.module.css';
 import BoardComponent from '@/components/Board/BoardComponent';
 
 interface HomeProps {}
@@ -14,7 +14,10 @@ export default function Home({}: HomeProps) {
             </Head>
             <main className={styles.main}>
                 <h1 className="text-3xl font-bold underline">Alice chess: a chess variant</h1>
-                <BoardComponent />
+                <div className="grid grid-cols-2 gap-4 mt-3">
+                    <BoardComponent />
+                    <BoardComponent isSecondBoard={true} />
+                </div>
             </main>
         </>
     );
