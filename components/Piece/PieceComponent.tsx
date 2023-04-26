@@ -15,7 +15,7 @@ export default function PieceComponent({ piece, onDragStart, onDragEnd }: PieceP
 
     return (
         <div id={'piece_' + coordinates} draggable="true" onDragStart={onDragStart} onDragEnd={onDragEnd} className={styles.piece}>
-            <Image data-coordinates={coordinates} src={'/board/' + piece.img} alt={piece.type} width="100" height="100" />
+            <Image data-coordinates={coordinates} data-ismainboard={piece.isOnMainBoard} src={'/board/' + piece.img} alt={piece.type} width="100" height="100" />
         </div>
     );
 }
