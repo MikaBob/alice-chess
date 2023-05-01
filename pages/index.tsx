@@ -1,22 +1,22 @@
-import Head from 'next/head';
-import styles from './index.module.css';
-import BoardComponent from '@/components/Board/BoardComponent';
-import Piece from '@/src/Pieces/Piece';
-import { useState } from 'react';
-import { Position, fromPositionToCoordinates } from '@/src/Utils';
-import { useGameContext } from '@/context/GameContext';
+import Head from 'next/head'
+import styles from './index.module.css'
+import BoardComponent from '@/components/Board/BoardComponent'
+import Piece from '@/src/Pieces/Piece'
+import { useState } from 'react'
+import { Position, fromPositionToCoordinates } from '@/src/Utils'
+import { useGameContext } from '@/context/GameContext'
 
 interface HomeProps {}
 
 export default function Home({}: HomeProps) {
-    const { game } = useGameContext();
-    const [history, setHistory] = useState('');
+    const { game } = useGameContext()
+    const [history, setHistory] = useState('')
 
     const callBackExecuteMove = (pieceToMove: Piece, newPosition: Position) => {
         if (game.executeMove(pieceToMove, newPosition)) {
-            setHistory(history + fromPositionToCoordinates(newPosition));
+            setHistory(history + fromPositionToCoordinates(newPosition))
         }
-    };
+    }
 
     return (
         <>
@@ -33,5 +33,5 @@ export default function Home({}: HomeProps) {
                 </div>
             </main>
         </>
-    );
+    )
 }
