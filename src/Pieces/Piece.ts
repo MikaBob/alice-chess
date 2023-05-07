@@ -1,6 +1,6 @@
 //import fs from 'fs';
 
-import Game from '../Game'
+import Game, { BOARD_COLUMNS, BOARD_ROWS } from '../Game'
 import Square from '../Square'
 import { Position } from '../Utils'
 
@@ -32,5 +32,14 @@ export default class Piece {
             this.possibleMoves.push(square.position)
         }
         return square.piece !== null
+    }
+
+    checkBoundariesAndOppositeBoard(rowToCheck: number, columnToCheck: number, oppositeBoard: Square[][]): boolean {
+        if (rowToCheck > -1 && rowToCheck < BOARD_ROWS && columnToCheck > -1 && columnToCheck < BOARD_COLUMNS) {
+            if (oppositeBoard[rowToCheck][columnToCheck].piece === null) {
+                return true
+            }
+        }
+        return false
     }
 }

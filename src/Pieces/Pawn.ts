@@ -1,6 +1,9 @@
-import Game, { BOARD_ROWS } from '../Game'
+import Game from '../Game'
 import Square from '../Square'
 import Piece from './Piece'
+
+export const PAWN_INITIAL_ROW_WHITE = 6
+export const PAWN_INITIAL_ROW_BLACK = 1
 
 export class Pawn extends Piece {
     constructor(isWhite: boolean) {
@@ -13,20 +16,77 @@ export class Pawn extends Piece {
         const currentBoard: Square[][] = this.isOnMainBoard ? game.board : game.secondBoard
         const oppositeBoard: Square[][] = this.isOnMainBoard ? game.secondBoard : game.board
 
-        // North
-        if (this.position.row - 1 > -1) {
-            for (let rowToCheck = this.position.row - 1; rowToCheck > 0; rowToCheck--) {
-                if (oppositeBoard[rowToCheck][this.position.column].piece === null && this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][this.position.column])) {
-                    rowToCheck = -1
+        let rowToCheck: number = this.position.row
+        let columnToCheck: number = this.position.column
+
+        if (this.isWhite) {
+            // North - 1 square
+            rowToCheck--
+            if (this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard) && currentBoard[rowToCheck][columnToCheck].piece === null) {
+                this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
+            }
+
+            // North-East
+            columnToCheck++
+            if (
+                this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard) &&
+                currentBoard[rowToCheck][columnToCheck].piece !== null &&
+                currentBoard[rowToCheck][columnToCheck].piece?.isWhite !== this.isWhite
+            ) {
+                this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
+            }
+
+            // North-West
+            columnToCheck -= 2
+            if (
+                this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard) &&
+                currentBoard[rowToCheck][columnToCheck].piece !== null &&
+                currentBoard[rowToCheck][columnToCheck].piece?.isWhite !== this.isWhite
+            ) {
+                this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
+            }
+
+            // North - 2 Squares
+            if (this.position.row === PAWN_INITIAL_ROW_WHITE) {
+                rowToCheck--
+                columnToCheck = this.position.column
+                if (this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard) && currentBoard[rowToCheck][columnToCheck].piece === null) {
+                    this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
                 }
             }
-        }
+        } else {
+            // South - 1 square
+            rowToCheck++
+            if (this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard) && currentBoard[rowToCheck][columnToCheck].piece === null) {
+                this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
+            }
 
-        // South
-        if (this.position.row + 1 < BOARD_ROWS) {
-            for (let rowToCheck = this.position.row + 1; rowToCheck < BOARD_ROWS; rowToCheck++) {
-                if (oppositeBoard[rowToCheck][this.position.column].piece === null && this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][this.position.column])) {
-                    rowToCheck = BOARD_ROWS
+            // South-East
+            columnToCheck++
+            if (
+                this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard) &&
+                currentBoard[rowToCheck][columnToCheck].piece !== null &&
+                currentBoard[rowToCheck][columnToCheck].piece?.isWhite !== this.isWhite
+            ) {
+                this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
+            }
+
+            // South-West
+            columnToCheck -= 2
+            if (
+                this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard) &&
+                currentBoard[rowToCheck][columnToCheck].piece !== null &&
+                currentBoard[rowToCheck][columnToCheck].piece?.isWhite !== this.isWhite
+            ) {
+                this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
+            }
+
+            // South - 2 Squares
+            if (this.position.row === PAWN_INITIAL_ROW_BLACK) {
+                rowToCheck++
+                columnToCheck = this.position.column
+                if (this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard) && currentBoard[rowToCheck][columnToCheck].piece === null) {
+                    this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
                 }
             }
         }

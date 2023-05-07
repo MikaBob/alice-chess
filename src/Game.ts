@@ -1,7 +1,7 @@
 import { Bishop } from './Pieces/Bishop'
 import { King } from './Pieces/King'
 import { Knight } from './Pieces/Knight'
-import { Pawn } from './Pieces/Pawn'
+import { PAWN_INITIAL_ROW_BLACK, PAWN_INITIAL_ROW_WHITE, Pawn } from './Pieces/Pawn'
 import Piece from './Pieces/Piece'
 import { Queen } from './Pieces/Queen'
 import { Tower } from './Pieces/Tower'
@@ -49,7 +49,7 @@ export default class Game {
         this.board[0][4].setPieceOnSquare(new King(false))
 
         for (let i = 0; i < BOARD_COLUMNS; i++) {
-            this.board[1][i].setPieceOnSquare(new Pawn(false))
+            this.board[PAWN_INITIAL_ROW_BLACK][i].setPieceOnSquare(new Pawn(false))
         }
 
         // white
@@ -66,7 +66,7 @@ export default class Game {
         this.board[7][4].setPieceOnSquare(new King(true))
 
         for (let i = 0; i < BOARD_COLUMNS; i++) {
-            this.board[6][i].setPieceOnSquare(new Pawn(true))
+            this.board[PAWN_INITIAL_ROW_WHITE][i].setPieceOnSquare(new Pawn(true))
         }
     }
 
