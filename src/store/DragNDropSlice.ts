@@ -1,17 +1,21 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { AppState } from './Store'
 import { HYDRATE } from 'next-redux-wrapper'
+import { Position } from '../Utils'
+import Piece from '../Pieces/Piece'
 
 // Type for our state
 export type DragNDropState = {
     isDragging: boolean
     hoveredCoordinates: string | null
+    piece: Piece | null
 }
 
 // Initial state
 const initialState: DragNDropState = {
     isDragging: false,
     hoveredCoordinates: null,
+    piece: null,
 }
 
 // Actual Slice
@@ -23,6 +27,7 @@ export const dragNDropSlice = createSlice({
         setDragNDropState(state, action) {
             state.isDragging = action.payload.isDragging
             state.hoveredCoordinates = action.payload.hoveredCoordinates
+            state.piece = action.payload.piece
         },
     },
 
@@ -33,6 +38,7 @@ export const dragNDropSlice = createSlice({
                 ...state,
                 ...action.payload.isDragging,
                 ...action.payload.hoveredCoordinates,
+                ...action.payload.piece,
             }
         },
     },

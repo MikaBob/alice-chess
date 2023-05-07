@@ -10,10 +10,7 @@ const makeStore = () =>
         devTools: true,
         middleware: getDefaultMiddleware =>
             getDefaultMiddleware({
-                serializableCheck: {
-                    // Ignore these field paths in all actions
-                    ignoredActionPaths: ['payload.pieceBeingDragged'],
-                },
+                serializableCheck: false,
             }),
     })
 

@@ -7,20 +7,29 @@
     height: var(--tile-width);
 }
 
-.pieceDraggedOver:before {
-    position: absolute;
+.pieceOriginalTile:before {
+    background: #caa3148c;
     content: '';
-    background: #1a14ca8c;
-    width: var(--tile-width);
     height: var(--tile-width);
     pointer-events: none;
+    position: absolute;
+    width: var(--tile-width);
 }
 
-.pieceOriginalTile:before {
-    position: absolute;
+.piecePossibleMoves:before {
+    background: #23ca1477;
     content: '';
-    background: #caa3148c;
-    width: var(--tile-width);
     height: var(--tile-width);
     pointer-events: none;
+    position: absolute;
+    width: var(--tile-width);
+}
+
+.pieceDraggedOver:before {
+    background: #1a14ca8c;
+    content: '';
+    height: var(--tile-width);
+    pointer-events: none;
+    position: absolute;
+    width: var(--tile-width);
 }

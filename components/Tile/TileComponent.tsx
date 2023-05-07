@@ -2,7 +2,7 @@ import Image from 'next/image'
 import PieceComponent from '../Piece/PieceComponent'
 import Square from '@/src/Square'
 import styles from './tile.module.css'
-import { Position, fromCoordinatesToPosition, fromPositionToCoordinates } from '@/src/Utils'
+import { Position, arePositionsIdentical, fromCoordinatesToPosition, fromPositionToCoordinates, isPositionInList } from '@/src/Utils'
 import { useState } from 'react'
 import Piece from '@/src/Pieces/Piece'
 import { useGameContext } from '@/context/GameContext'
@@ -14,63 +14,64 @@ interface TileProps {
     callBackExecuteMove: any
 }
 
-let draggedPiece: Piece | null = null
 export default function TileComponent({ square, callBackExecuteMove }: TileProps) {
     const { game } = useGameContext()
     const coordinates: string = fromPositionToCoordinates(square.position)
     const tileColor: string = square.isWhite ? 'white' : 'black'
-    const [cssClasses, setCssClasses] = useState(styles.tile)
 
     const dragNDropState: DragNDropState = useSelector(selectDragNDropState)
     const dispatch = useDispatch()
 
     function pieceDragStart(e: React.DragEvent<HTMLDivElement>) {
+        //console.log('pieceDragStart')
         if (e !== null && e.target instanceof HTMLElement) {
             const isPieceOnMainBoard: boolean | undefined = e.target.dataset.ismainboard === 'true'
             const targetCoordinates: string | undefined = e.target.dataset.coordinates
             if (targetCoordinates !== undefined && isPieceOnMainBoard !== undefined) {
                 const targetPosition: Position = fromCoordinatesToPosition(targetCoordinates)
-                const piece: Piece | null = isPieceOnMainBoard ? game.board[targetPosition.row][targetPosition.column].piece : game.secondBoard[targetPosition.row][targetPosition.column].piece
-                if (piece !== null) {
-                    draggedPiece = piece
-                    setCssClasses(styles.tile + ' ' + styles.pieceOriginalTile)
+                const pieceDragged: Piece | null = isPieceOnMainBoard ? game.board[targetPosition.row][targetPosition.column].piece : game.secondBoard[targetPosition.row][targetPosition.column].piece
+                if (pieceDragged !== null) {
+                    pieceDragged.calculatePossibleMoves(game)
+                    dispatch(setDragNDropState({ isDragging: true, hoveredCoordinates: targetCoordinates, piece: pieceDragged } as DragNDropState))
                 }
             }
         }
-        //console.log('pieceDragStart', draggedPiece);
     }
 
     function pieceDropped(e: any) {
+        //console.log('piecedropped')
         const targetCoordinates: string = e.target.dataset.coordinates
-        setCssClasses(styles.tile)
 
-        if (draggedPiece !== null) {
+        if (dragNDropState.piece !== null) {
             const newPosition: Position = fromCoordinatesToPosition(targetCoordinates)
 
-            if (newPosition.row !== draggedPiece.position.row || newPosition.column !== draggedPiece.position.column) {
-                callBackExecuteMove(draggedPiece, newPosition)
+            if (newPosition.row !== dragNDropState.piece.position.row || newPosition.column !== dragNDropState.piece.position.column) {
+                callBackExecuteMove(dragNDropState.piece, newPosition)
             }
-            //console.log('piecedropped', draggedPiece, targetCoordinates);
         }
-        dispatch(setDragNDropState({ isDragging: false, hoveredCoordinates: null } as DragNDropState))
+        dispatch(setDragNDropState({ isDragging: false, hoveredCoordinates: null, piece: null } as DragNDropState))
     }
 
     function tileDragEnter(e: React.DragEvent<HTMLDivElement>) {
-        //console.log('tileDragEnter', draggedPiece);
-        if (draggedPiece !== null && coordinates !== fromPositionToCoordinates(draggedPiece.position)) {
-            //setCssClasses(styles.tile + ' ' + styles.pieceDraggedOver)
-        }
-        dispatch(setDragNDropState({ isDragging: true, hoveredCoordinates: fromPositionToCoordinates(square.position) } as DragNDropState))
+        //console.log('tileDragEnter', dragNDropState)
+        dispatch(
+            setDragNDropState({
+                isDragging: true,
+                hoveredCoordinates: fromPositionToCoordinates(square.position),
+                piece: dragNDropState.piece,
+            } as DragNDropState),
+        )
     }
 
     function tileDragLeave(e: React.DragEvent<HTMLDivElement>) {
-        //console.log('tileDragLeave', draggedPiece);
-        if (e !== null && e.target instanceof HTMLElement) {
+        //console.log('tileDragLeave')
+        /*         if (e !== null && e.target instanceof HTMLElement) {
             const targetCoordinates: string | undefined = e.target.dataset.coordinates
             if (targetCoordinates !== undefined) {
-                if (draggedPiece !== null && fromPositionToCoordinates(draggedPiece.position) !== targetCoordinates) setCssClasses(styles.tile)
+                if (dragNDropState.piece !== null && fromPositionToCoordinates(dragNDropState.piece.position) !== targetCoordinates) {
+                }
             }
-        }
+        } */
     }
 
     function onDragOver(e: any) {
@@ -79,17 +80,27 @@ export default function TileComponent({ square, callBackExecuteMove }: TileProps
         e.dataTransfer.dropEffect = 'move'
     }
 
-    const isPieceAboveTile: boolean = dragNDropState.isDragging !== null ? coordinates === dragNDropState.hoveredCoordinates : false
+    const isPieceAboveTile: boolean = dragNDropState.isDragging ? coordinates === dragNDropState.hoveredCoordinates : false
+    let isTileAPossiblePosition: boolean = false
+    let isOriginalTileOfDraggedPiece: boolean = false
+
+    if (dragNDropState.piece !== null) {
+        isOriginalTileOfDraggedPiece = arePositionsIdentical(square.position, dragNDropState.piece.position)
+        if (dragNDropState.piece.possibleMoves.length > 0) {
+            if (isPositionInList(square.position, dragNDropState.piece.possibleMoves)) {
+                isTileAPossiblePosition = true
+            }
+        }
+    }
+
+    let cssClasses: string = styles.tile
+    cssClasses += isOriginalTileOfDraggedPiece ? ' ' + styles.pieceOriginalTile : ''
+    cssClasses += isTileAPossiblePosition ? ' ' + styles.piecePossibleMoves : ''
+    cssClasses += isPieceAboveTile ? ' ' + styles.pieceDraggedOver : ''
+
     return (
         <td>
-            <div
-                id={'tile_' + coordinates}
-                className={isPieceAboveTile ? cssClasses + ' ' + styles.pieceDraggedOver : cssClasses}
-                onDragEnter={tileDragEnter}
-                onDragLeave={tileDragLeave}
-                onDragOver={onDragOver}
-                onDrop={pieceDropped}
-            >
+            <div id={'tile_' + coordinates} className={cssClasses} onDragEnter={tileDragEnter} onDragLeave={tileDragLeave} onDragOver={onDragOver} onDrop={pieceDropped}>
                 <div className={styles.tileBackground}>
                     <Image data-coordinates={coordinates} src={'/board/' + tileColor + '-tile.png'} alt={tileColor + ' tile'} width="100" height="100" />
                 </div>

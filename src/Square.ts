@@ -14,11 +14,19 @@ export default class Square {
         this.isOnMainBoard = isOnMainBoard
     }
 
-    public setPieceOnTile(piece: Piece | null) {
+    public setPieceOnSquare(piece: Piece | null) {
         this.piece = piece
         if (this.piece !== null) {
             this.piece.isOnMainBoard = this.isOnMainBoard
             this.piece.position = this.position
         }
+    }
+
+    public isSquarePossibleMoveForPiece(pieceToCheckFor: Piece): boolean {
+        // not empty and pieces of same color
+        if (this.piece != null && pieceToCheckFor.isWhite === this.piece.isWhite) {
+            return false
+        }
+        return true
     }
 }
