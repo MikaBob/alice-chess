@@ -2,9 +2,11 @@ import Game, { BOARD_COLUMNS, BOARD_ROWS } from '../Game'
 import Square from '../Square'
 import Piece from './Piece'
 
+export const PIECE_TYPE_TOWER = 'Tower'
+
 export class Tower extends Piece {
     constructor(isWhite: boolean) {
-        super('Tower', 'tower.png', isWhite)
+        super(PIECE_TYPE_TOWER, PIECE_TYPE_TOWER.toLowerCase(), isWhite)
     }
 
     calculatePossibleMoves(game: Game): void {
@@ -48,5 +50,9 @@ export class Tower extends Piece {
                 }
             }
         }
+    }
+
+    createNewPieceOfSameType(): Tower {
+        return new Tower(this.isWhite)
     }
 }

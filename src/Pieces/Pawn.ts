@@ -2,12 +2,23 @@ import Game from '../Game'
 import Square from '../Square'
 import Piece from './Piece'
 
+export const PIECE_TYPE_PAWN = 'Pawn'
 export const PAWN_INITIAL_ROW_WHITE = 6
 export const PAWN_INITIAL_ROW_BLACK = 1
 
 export class Pawn extends Piece {
     constructor(isWhite: boolean) {
-        super('Pawn', 'pawn.png', isWhite)
+        super(PIECE_TYPE_PAWN, PIECE_TYPE_PAWN.toLowerCase(), isWhite)
+    }
+
+    pawnOverrideForAddSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(square: Square, isAnActualMove: boolean = true): boolean {
+        if (square.hasSquareAPieceOfDifferentColorOrIsEmpty(this)) {
+            if (isAnActualMove) this.possibleMoves.push(square.position)
+            else {
+                square.isThreatenBy.push(this)
+            }
+        }
+        return square.piece !== null
     }
 
     calculatePossibleMoves(game: Game): void {
@@ -23,27 +34,19 @@ export class Pawn extends Piece {
             // North - 1 square
             rowToCheck--
             if (this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard) && currentBoard[rowToCheck][columnToCheck].piece === null) {
-                this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
+                this.pawnOverrideForAddSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
             }
 
             // North-East
             columnToCheck++
-            if (
-                this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard) &&
-                currentBoard[rowToCheck][columnToCheck].piece !== null &&
-                currentBoard[rowToCheck][columnToCheck].piece?.isWhite !== this.isWhite
-            ) {
-                this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
+            if (this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard)) {
+                this.pawnOverrideForAddSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck], false)
             }
 
             // North-West
             columnToCheck -= 2
-            if (
-                this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard) &&
-                currentBoard[rowToCheck][columnToCheck].piece !== null &&
-                currentBoard[rowToCheck][columnToCheck].piece?.isWhite !== this.isWhite
-            ) {
-                this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
+            if (this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard)) {
+                this.pawnOverrideForAddSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck], false)
             }
 
             // North - 2 Squares
@@ -51,34 +54,26 @@ export class Pawn extends Piece {
                 rowToCheck--
                 columnToCheck = this.position.column
                 if (this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard) && currentBoard[rowToCheck][columnToCheck].piece === null) {
-                    this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
+                    this.pawnOverrideForAddSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
                 }
             }
         } else {
             // South - 1 square
             rowToCheck++
             if (this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard) && currentBoard[rowToCheck][columnToCheck].piece === null) {
-                this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
+                this.pawnOverrideForAddSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
             }
 
             // South-East
             columnToCheck++
-            if (
-                this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard) &&
-                currentBoard[rowToCheck][columnToCheck].piece !== null &&
-                currentBoard[rowToCheck][columnToCheck].piece?.isWhite !== this.isWhite
-            ) {
-                this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
+            if (this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard)) {
+                this.pawnOverrideForAddSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck], false)
             }
 
             // South-West
             columnToCheck -= 2
-            if (
-                this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard) &&
-                currentBoard[rowToCheck][columnToCheck].piece !== null &&
-                currentBoard[rowToCheck][columnToCheck].piece?.isWhite !== this.isWhite
-            ) {
-                this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
+            if (this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard)) {
+                this.pawnOverrideForAddSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck], false)
             }
 
             // South - 2 Squares
@@ -86,9 +81,13 @@ export class Pawn extends Piece {
                 rowToCheck++
                 columnToCheck = this.position.column
                 if (this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard) && currentBoard[rowToCheck][columnToCheck].piece === null) {
-                    this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
+                    this.pawnOverrideForAddSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
                 }
             }
         }
+    }
+
+    createNewPieceOfSameType(): Pawn {
+        return new Pawn(this.isWhite)
     }
 }

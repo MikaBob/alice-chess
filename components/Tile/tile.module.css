@@ -16,6 +16,15 @@
     width: var(--tile-width);
 }
 
+.tileUnderThreat::before {
+    background: #ca14146f;
+    content: '';
+    height: var(--tile-width);
+    pointer-events: none;
+    position: absolute;
+    width: var(--tile-width);
+}
+
 .piecePossibleMoves:before {
     background: #23ca1477;
     content: '';

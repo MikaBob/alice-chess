@@ -6,8 +6,11 @@ type GameContextType = {
     updateGame: () => void
 }
 
+const game = new Game()
+game.initChessSet()
+
 const gameContextDefaultValues: GameContextType = {
-    game: new Game(),
+    game: game,
     updateGame: () => {},
 }
 
@@ -26,7 +29,6 @@ export function GameProvider({ children }: GameProviderProps) {
 
     const updateGame = () => {
         setGame(game)
-        console.log('update game', game)
     }
 
     return <GameContext.Provider value={{ game, updateGame }}> {children} </GameContext.Provider>

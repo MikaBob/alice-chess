@@ -31,7 +31,6 @@ export default function TileComponent({ square, callBackExecuteMove }: TileProps
                 const targetPosition: Position = fromCoordinatesToPosition(targetCoordinates)
                 const pieceDragged: Piece | null = isPieceOnMainBoard ? game.board[targetPosition.row][targetPosition.column].piece : game.secondBoard[targetPosition.row][targetPosition.column].piece
                 if (pieceDragged !== null) {
-                    pieceDragged.calculatePossibleMoves(game)
                     dispatch(setDragNDropState({ isDragging: true, hoveredCoordinates: targetCoordinates, piece: pieceDragged } as DragNDropState))
                 }
             }
@@ -80,10 +79,8 @@ export default function TileComponent({ square, callBackExecuteMove }: TileProps
         e.dataTransfer.dropEffect = 'move'
     }
 
-    const isPieceAboveTile: boolean = dragNDropState.isDragging ? coordinates === dragNDropState.hoveredCoordinates : false
-    let isTileAPossiblePosition: boolean = false
     let isOriginalTileOfDraggedPiece: boolean = false
-
+    let isTileAPossiblePosition: boolean = false
     if (dragNDropState.piece !== null) {
         isOriginalTileOfDraggedPiece = arePositionsIdentical(square.position, dragNDropState.piece.position)
         if (dragNDropState.piece.possibleMoves.length > 0) {
@@ -92,11 +89,14 @@ export default function TileComponent({ square, callBackExecuteMove }: TileProps
             }
         }
     }
+    const isPieceAboveTile: boolean = dragNDropState.isDragging ? coordinates === dragNDropState.hoveredCoordinates : false
+    const isTileUnderThreat: boolean = square.isThreatenBy.length > 0
 
     let cssClasses: string = styles.tile
     cssClasses += isOriginalTileOfDraggedPiece ? ' ' + styles.pieceOriginalTile : ''
     cssClasses += isTileAPossiblePosition ? ' ' + styles.piecePossibleMoves : ''
     cssClasses += isPieceAboveTile ? ' ' + styles.pieceDraggedOver : ''
+    cssClasses += isTileUnderThreat && square.piece?.type === 'King' ? ' ' + styles.tileUnderThreat : ''
 
     return (
         <td>

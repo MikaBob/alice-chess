@@ -1,5 +1,5 @@
 import { Bishop } from './Pieces/Bishop'
-import { King } from './Pieces/King'
+import { King, PIECE_TYPE_KING } from './Pieces/King'
 import { Knight } from './Pieces/Knight'
 import { PAWN_INITIAL_ROW_BLACK, PAWN_INITIAL_ROW_WHITE, Pawn } from './Pieces/Pawn'
 import Piece from './Pieces/Piece'
@@ -30,7 +30,6 @@ export default class Game {
             }
             isWhiteTile++ // alternate at each rows
         }
-        this.initChessSet()
         this.isWhiteTurnToPlay = true
     }
 
@@ -68,26 +67,99 @@ export default class Game {
         for (let i = 0; i < BOARD_COLUMNS; i++) {
             this.board[PAWN_INITIAL_ROW_WHITE][i].setPieceOnSquare(new Pawn(true))
         }
+        this.calculateThreats()
     }
 
-    public executeMove(pieceToMove: Piece, positionTo: Position): boolean {
-        //console.log('before', pieceToMove.isWhite, this.isWhiteTurnToPlay, this.board[pieceToMove.position.row][pieceToMove.position.column], positionTo, pieceToMove, this.isWhiteTurnToPlay);
-
+    public verifyMove(pieceToMove: Piece, positionTo: Position): boolean {
         if (pieceToMove.isWhite === this.isWhiteTurnToPlay && isPositionInList(positionTo, pieceToMove.possibleMoves)) {
-            if (pieceToMove.isOnMainBoard) {
-                this.board[pieceToMove.position.row][pieceToMove.position.column].setPieceOnSquare(null)
-                this.board[positionTo.row][positionTo.column].setPieceOnSquare(null)
-                this.secondBoard[positionTo.row][positionTo.column].setPieceOnSquare(pieceToMove)
-            } else {
-                this.secondBoard[pieceToMove.position.row][pieceToMove.position.column].setPieceOnSquare(null)
-                this.secondBoard[positionTo.row][positionTo.column].setPieceOnSquare(null)
-                this.board[positionTo.row][positionTo.column].setPieceOnSquare(pieceToMove)
+            // Kings can't move on a threaten square
+            if (pieceToMove.type === PIECE_TYPE_KING) {
+                const kingsCurrentBoard: Square[][] = pieceToMove.isOnMainBoard ? this.board : this.secondBoard
+                const piecesThreateningKingsNewPosition: Piece[] = kingsCurrentBoard[positionTo.row][positionTo.column].isThreatenBy
+                //console.log((pieceToMove.isWhite ? 'white' : 'black') + ' king is moving', piecesThreateningKingsNewPosition)
+                for (let i = 0; i < piecesThreateningKingsNewPosition.length; i++) {
+                    if (piecesThreateningKingsNewPosition[i].isWhite !== pieceToMove.isWhite) {
+                        return false
+                    }
+                }
             }
 
-            this.isWhiteTurnToPlay = !this.isWhiteTurnToPlay
-            //console.log('after', pieceToMove.isWhite, this.isWhiteTurnToPlay, this.board[pieceToMove.position.row][pieceToMove.position.column], positionTo, pieceToMove, this.isWhiteTurnToPlay);
-            return true
+            let tmpGame: Game | null = this.cloneGame()
+            const tmpPieceToMove: Piece = pieceToMove.clone()
+            tmpGame.executeMove(tmpPieceToMove, positionTo)
+            tmpGame.isWhiteTurnToPlay = !tmpGame.isWhiteTurnToPlay // cancel changing turns
+            tmpGame.calculateThreats()
+            if (tmpGame.isKingUnderThreat()) {
+                tmpGame = null
+            }
+            return tmpGame !== null
         }
         return false
+    }
+
+    public executeMove(pieceToMove: Piece, positionTo: Position): void {
+        //console.log('before', pieceToMove.isWhite, this.isWhiteTurnToPlay, this.board[pieceToMove.position.row][pieceToMove.position.column], positionTo, pieceToMove, this.isWhiteTurnToPlay);
+        if (pieceToMove.isOnMainBoard) {
+            this.board[pieceToMove.position.row][pieceToMove.position.column].setPieceOnSquare(null)
+            this.board[positionTo.row][positionTo.column].setPieceOnSquare(null)
+            this.secondBoard[positionTo.row][positionTo.column].setPieceOnSquare(pieceToMove)
+        } else {
+            this.secondBoard[pieceToMove.position.row][pieceToMove.position.column].setPieceOnSquare(null)
+            this.secondBoard[positionTo.row][positionTo.column].setPieceOnSquare(null)
+            this.board[positionTo.row][positionTo.column].setPieceOnSquare(pieceToMove)
+        }
+        this.isWhiteTurnToPlay = !this.isWhiteTurnToPlay
+        //console.log('after', pieceToMove.isWhite, this.isWhiteTurnToPlay, this.board[pieceToMove.position.row][pieceToMove.position.column], positionTo, pieceToMove, this.isWhiteTurnToPlay);
+    }
+
+    public calculateThreats(): void {
+        // reset all threats
+        for (let i = 0; i < BOARD_ROWS; i++) {
+            for (let j = 0; j < BOARD_COLUMNS; j++) {
+                this.board[i][j].isThreatenBy = []
+                this.secondBoard[i][j].isThreatenBy = []
+            }
+        }
+
+        for (let i = 0; i < BOARD_ROWS; i++) {
+            for (let j = 0; j < BOARD_COLUMNS; j++) {
+                if (this.board[i][j].piece !== null) this.board[i][j].piece?.calculatePossibleMoves(this)
+                if (this.secondBoard[i][j].piece !== null) this.secondBoard[i][j].piece?.calculatePossibleMoves(this)
+            }
+        }
+    }
+
+    public isKingUnderThreat(): boolean {
+        for (let i = 0; i < BOARD_ROWS; i++) {
+            for (let j = 0; j < BOARD_COLUMNS; j++) {
+                if (this.board[i][j].piece !== null) {
+                    if (this.board[i][j].piece?.type === PIECE_TYPE_KING && this.board[i][j].piece?.isWhite === this.isWhiteTurnToPlay && this.board[i][j].isThreatenBy.length > 0) {
+                        //console.log(`Check on ${this.board[i][j].piece?.isWhite ? 'white' : 'black'} king (Main board)`, this.board[i][j], this.secondBoard[i][j])
+                        return true
+                    }
+                }
+
+                if (this.secondBoard[i][j].piece !== null) {
+                    if (this.secondBoard[i][j].piece?.type === PIECE_TYPE_KING && this.secondBoard[i][j].piece?.isWhite === this.isWhiteTurnToPlay && this.secondBoard[i][j].isThreatenBy.length > 0) {
+                        //console.log(`Check on ${this.board[i][j].piece?.isWhite ? 'white' : 'black'} king (Second board)`, this.board[i][j], this.secondBoard[i][j])
+                        return true
+                    }
+                }
+            }
+        }
+        return false
+    }
+
+    public cloneGame(): Game {
+        const clone: Game = new Game()
+        for (let i = 0; i < BOARD_ROWS; i++) {
+            for (let j = 0; j < BOARD_COLUMNS; j++) {
+                clone.board[i][j].setPieceOnSquare(this.board[i][j].piece)
+                clone.secondBoard[i][j].setPieceOnSquare(this.secondBoard[i][j].piece)
+            }
+        }
+
+        clone.isWhiteTurnToPlay = this.isWhiteTurnToPlay ? true : false
+        return clone
     }
 }

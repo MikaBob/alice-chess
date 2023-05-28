@@ -13,9 +13,12 @@ export default function Home({}: HomeProps) {
     const [history, setHistory] = useState('')
 
     const callBackExecuteMove = (pieceToMove: Piece, newPosition: Position) => {
-        if (game.executeMove(pieceToMove, newPosition)) {
-            setHistory(history + fromPositionToCoordinates(newPosition))
+        if (game.verifyMove(pieceToMove, newPosition)) {
+            game.executeMove(pieceToMove, newPosition)
+            game.calculateThreats()
+            setHistory(history + fromPositionToCoordinates(newPosition) + ';')
         }
+        console.log(history)
     }
 
     return (

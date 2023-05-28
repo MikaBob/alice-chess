@@ -2,9 +2,11 @@ import Game from '../Game'
 import Square from '../Square'
 import Piece from './Piece'
 
+export const PIECE_TYPE_KING = 'King'
+
 export class King extends Piece {
     constructor(isWhite: boolean) {
-        super('King', 'king.png', isWhite)
+        super(PIECE_TYPE_KING, PIECE_TYPE_KING.toLowerCase(), isWhite)
     }
 
     calculatePossibleMoves(game: Game): void {
@@ -63,5 +65,9 @@ export class King extends Piece {
         if (this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard)) {
             this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
         }
+    }
+
+    createNewPieceOfSameType(): King {
+        return new King(this.isWhite)
     }
 }

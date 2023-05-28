@@ -18,7 +18,7 @@ export default class Piece {
         this.position = { row: -1, column: -1 }
         this.isWhite = isWhite
         this.isOnMainBoard = true
-        this.img = (this.isWhite ? 'white/' : 'black/') + img
+        this.img = (this.isWhite ? 'white/' : 'black/') + img + '.png'
         //this.imgB64 = Buffer.from(fs.readFileSync('./public/board/' + this.img, { encoding: 'binary' })).toString('base64');
         this.possibleMoves = []
     }
@@ -28,10 +28,11 @@ export default class Piece {
     }
 
     addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(square: Square): boolean {
-        if (square.isSquarePossibleMoveForPiece(this)) {
+        if (square.hasSquareAPieceOfDifferentColorOrIsEmpty(this)) {
             this.possibleMoves.push(square.position)
+            square.isThreatenBy.push(this)
         }
-        return square.piece !== null
+        return square.piece !== null && square.piece.type !== 'King' // ignore kings to continue threats behind him
     }
 
     checkBoundariesAndOppositeBoard(rowToCheck: number, columnToCheck: number, oppositeBoard: Square[][]): boolean {
@@ -41,5 +42,20 @@ export default class Piece {
             }
         }
         return false
+    }
+
+    createNewPieceOfSameType(): Piece {
+        throw new Error(`Piece ${this.type} must extend function createNewPieceOfSameType()!`)
+    }
+
+    clone(): Piece {
+        let clone: Piece = this.createNewPieceOfSameType()
+
+        clone.position = { row: this.position.row, column: this.position.column }
+        clone.isOnMainBoard = this.isOnMainBoard
+        clone.img = this.img
+        //this.imgB64 = Buffer.from(fs.readFileSync('./public/board/' + this.img, { encoding: 'binary' })).toString('base64');
+        clone.possibleMoves = structuredClone(this.possibleMoves)
+        return clone
     }
 }

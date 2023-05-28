@@ -19,8 +19,8 @@ export default function PieceComponent({ piece, onDragStart }: PieceProps) {
         return false
     }
 
-    // if it is your turn, activate drag&drop (onDragStart | OnMouseDown)
     if (game.isWhiteTurnToPlay === piece.isWhite) {
+        // if it is your turn, activate drag&drop (onDragStart | OnMouseDown)
         return (
             <div id={'piece_' + coordinates} draggable="true" onDragStart={onDragStart} className={styles.piece}>
                 <Image data-coordinates={coordinates} data-ismainboard={piece.isOnMainBoard} src={'/board/' + piece.img} alt={piece.type} width="100" height="100" />
