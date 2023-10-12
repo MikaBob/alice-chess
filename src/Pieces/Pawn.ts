@@ -11,9 +11,16 @@ export class Pawn extends Piece {
         super(PIECE_TYPE_PAWN, PIECE_TYPE_PAWN.toLowerCase(), isWhite)
     }
 
+    /**
+     * Diagonals are not actually a normal move.
+     * It's is an exceptional move when an enemy is present
+     * and normal moves do not eat other pieces, therefore are not threats
+    */
     pawnOverrideForAddSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(square: Square, isAnActualMove: boolean = true): boolean {
         if (square.hasSquareAPieceOfDifferentColorOrIsEmpty(this)) {
-            if (isAnActualMove) this.possibleMoves.push(square.position)
+            if (isAnActualMove || (square.piece !== null && square.piece.isWhite !== this.isWhite)){
+                this.possibleMoves.push(square.position)
+            }
             else {
                 square.isThreatenBy.push(this)
             }
@@ -90,4 +97,6 @@ export class Pawn extends Piece {
     createNewPieceOfSameType(): Pawn {
         return new Pawn(this.isWhite)
     }
+
+    getShortName(): String {return ''}
 }

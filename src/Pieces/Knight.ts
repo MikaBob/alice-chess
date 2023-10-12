@@ -78,4 +78,6 @@ export class Knight extends Piece {
     createNewPieceOfSameType(): Knight {
         return new Knight(this.isWhite)
     }
+
+    getShortName(): String {return 'N'}
 }

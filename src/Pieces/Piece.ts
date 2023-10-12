@@ -58,4 +58,8 @@ export default class Piece {
         clone.possibleMoves = structuredClone(this.possibleMoves)
         return clone
     }
+
+    getShortName(): String {
+        throw new Error(`Piece ${this.type} must extend function getShortName()!`)
+    }
 }

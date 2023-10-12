@@ -63,4 +63,6 @@ export class Bishop extends Piece {
     createNewPieceOfSameType(): Bishop {
         return new Bishop(this.isWhite)
     }
+
+    getShortName(): String {return 'B'}
 }

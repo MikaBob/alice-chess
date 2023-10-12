@@ -70,4 +70,6 @@ export class King extends Piece {
     createNewPieceOfSameType(): King {
         return new King(this.isWhite)
     }
+
+    getShortName(): String {return 'Kg'}
 }

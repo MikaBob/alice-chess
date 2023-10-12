@@ -7,7 +7,7 @@ https://en.wikipedia.org/wiki/Alice_chess
 # To do
 
 Client
-display both boards
+~~display both boards~~
 animation moves
 Server
 create game

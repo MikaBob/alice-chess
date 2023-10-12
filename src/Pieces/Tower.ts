@@ -55,4 +55,6 @@ export class Tower extends Piece {
     createNewPieceOfSameType(): Tower {
         return new Tower(this.isWhite)
     }
+
+    getShortName(): String {return 'R'}
 }

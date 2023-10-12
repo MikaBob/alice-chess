@@ -99,4 +99,6 @@ export class Queen extends Piece {
     createNewPieceOfSameType(): Queen {
         return new Queen(this.isWhite)
     }
+
+    getShortName(): String {return 'Q'}
 }

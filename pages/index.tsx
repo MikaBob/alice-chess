@@ -10,15 +10,13 @@ interface HomeProps {}
 
 export default function Home({}: HomeProps) {
     const { game } = useGameContext()
-    const [history, setHistory] = useState('')
 
     const callBackExecuteMove = (pieceToMove: Piece, newPosition: Position) => {
         if (game.verifyMove(pieceToMove, newPosition)) {
             game.executeMove(pieceToMove, newPosition)
             game.calculateThreats()
-            setHistory(history + fromPositionToCoordinates(newPosition) + ';')
         }
-        console.log(history)
+        console.log(game.moveList)
     }
 
     return (

@@ -6,7 +6,7 @@ import Piece from './Pieces/Piece'
 import { Queen } from './Pieces/Queen'
 import { Tower } from './Pieces/Tower'
 import Square from './Square'
-import { Position, isPositionInList } from './Utils'
+import { fromPositionToCoordinates, Position, isPositionInList } from './Utils'
 
 export const BOARD_ROWS = 8
 export const BOARD_COLUMNS = 8
@@ -15,6 +15,7 @@ export default class Game {
     board: Square[][]
     secondBoard: Square[][]
     isWhiteTurnToPlay: boolean
+    moveList: String[]
 
     constructor() {
         this.board = []
@@ -31,6 +32,7 @@ export default class Game {
             isWhiteTile++ // alternate at each rows
         }
         this.isWhiteTurnToPlay = true
+        this.moveList = []
     }
 
     public initChessSet() {
@@ -72,7 +74,7 @@ export default class Game {
 
     public verifyMove(pieceToMove: Piece, positionTo: Position): boolean {
         if (pieceToMove.isWhite === this.isWhiteTurnToPlay && isPositionInList(positionTo, pieceToMove.possibleMoves)) {
-            // Kings can't move on a threaten square
+            // Kings can't move on a square threaten by an enemy
             if (pieceToMove.type === PIECE_TYPE_KING) {
                 const kingsCurrentBoard: Square[][] = pieceToMove.isOnMainBoard ? this.board : this.secondBoard
                 const piecesThreateningKingsNewPosition: Piece[] = kingsCurrentBoard[positionTo.row][positionTo.column].isThreatenBy
@@ -108,6 +110,7 @@ export default class Game {
             this.secondBoard[positionTo.row][positionTo.column].setPieceOnSquare(null)
             this.board[positionTo.row][positionTo.column].setPieceOnSquare(pieceToMove)
         }
+        this.moveList.push(pieceToMove.getShortName()+fromPositionToCoordinates(positionTo).toLowerCase())
         this.isWhiteTurnToPlay = !this.isWhiteTurnToPlay
         //console.log('after', pieceToMove.isWhite, this.isWhiteTurnToPlay, this.board[pieceToMove.position.row][pieceToMove.position.column], positionTo, pieceToMove, this.isWhiteTurnToPlay);
     }
