@@ -6,14 +6,23 @@ https://en.wikipedia.org/wiki/Alice_chess
 
 # To do
 
-Client
-~~display both boards~~
-animation moves
-Server
-create game
-make move
-receive move
-game over
-take back
-DB of games
-lock 2 players
+-   Local games
+    -   ~~display 1st boards with pieces~~
+    -   ~~Drag and drop pieces~~
+    -   ~~Take pieces on drop~~
+    -   ~~2nd board with change of board upon moves (alice moves)~~
+    -   ~~Limit pieces to their movements~~
+    -   ~~Previsualisation of possible moves~~
+    -   ~~Prevent forbidden moves~~
+    -   ~~Historic of moves~~
+    -   ~~Castling~~
+    -   Promoting
+    -   Animate moves
+    -   Game over
+-   Multiplayer
+    -   Client
+        -   Websocket
+        -   Send moves
+    -   Server
+        -   Create game
+        -   Receive moves and confirm
