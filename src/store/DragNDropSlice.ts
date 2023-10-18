@@ -1,7 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { AppState } from './Store'
 import { HYDRATE } from 'next-redux-wrapper'
-import { Position } from '../Utils'
 import Piece from '../Pieces/Piece'
 
 // Type for our state
@@ -19,7 +18,7 @@ const initialState: DragNDropState = {
 }
 
 // Actual Slice
-export const dragNDropSlice = createSlice({
+export const dragNDropSlice: any = createSlice({
     name: 'dragNDrop',
     initialState,
     reducers: {

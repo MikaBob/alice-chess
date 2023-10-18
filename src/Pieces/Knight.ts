@@ -79,5 +79,7 @@ export class Knight extends Piece {
         return new Knight(this.isWhite)
     }
 
-    getShortName(): String {return 'N'}
+    getShortName(): string {
+        return 'N'
+    }
 }

@@ -20,49 +20,81 @@ export class King extends Piece {
 
         // North
         rowToCheck--
-        if (this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard)) {
+        if (
+            this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard) &&
+            !currentBoard[rowToCheck][columnToCheck].isThreatenByColor(!this.isWhite) &&
+            !oppositeBoard[rowToCheck][columnToCheck].isThreatenByColor(!this.isWhite)
+        ) {
             this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
         }
 
         // North-East
         columnToCheck++
-        if (this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard)) {
+        if (
+            this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard) &&
+            !currentBoard[rowToCheck][columnToCheck].isThreatenByColor(!this.isWhite) &&
+            !oppositeBoard[rowToCheck][columnToCheck].isThreatenByColor(!this.isWhite)
+        ) {
             this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
         }
 
         // East
         rowToCheck++
-        if (this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard)) {
+        if (
+            this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard) &&
+            !currentBoard[rowToCheck][columnToCheck].isThreatenByColor(!this.isWhite) &&
+            !oppositeBoard[rowToCheck][columnToCheck].isThreatenByColor(!this.isWhite)
+        ) {
             this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
         }
 
         // South-East
         rowToCheck++
-        if (this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard)) {
+        if (
+            this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard) &&
+            !currentBoard[rowToCheck][columnToCheck].isThreatenByColor(!this.isWhite) &&
+            !oppositeBoard[rowToCheck][columnToCheck].isThreatenByColor(!this.isWhite)
+        ) {
             this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
         }
 
         // South
         columnToCheck--
-        if (this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard)) {
+        if (
+            this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard) &&
+            !currentBoard[rowToCheck][columnToCheck].isThreatenByColor(!this.isWhite) &&
+            !oppositeBoard[rowToCheck][columnToCheck].isThreatenByColor(!this.isWhite)
+        ) {
             this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
         }
 
         // South-West
         columnToCheck--
-        if (this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard)) {
+        if (
+            this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard) &&
+            !currentBoard[rowToCheck][columnToCheck].isThreatenByColor(!this.isWhite) &&
+            !oppositeBoard[rowToCheck][columnToCheck].isThreatenByColor(!this.isWhite)
+        ) {
             this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
         }
 
         // West
         rowToCheck--
-        if (this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard)) {
+        if (
+            this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard) &&
+            !currentBoard[rowToCheck][columnToCheck].isThreatenByColor(!this.isWhite) &&
+            !oppositeBoard[rowToCheck][columnToCheck].isThreatenByColor(!this.isWhite)
+        ) {
             this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
         }
 
         // North-West
         rowToCheck--
-        if (this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard)) {
+        if (
+            this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard) &&
+            !currentBoard[rowToCheck][columnToCheck].isThreatenByColor(!this.isWhite) &&
+            !oppositeBoard[rowToCheck][columnToCheck].isThreatenByColor(!this.isWhite)
+        ) {
             this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
         }
     }
@@ -71,5 +103,7 @@ export class King extends Piece {
         return new King(this.isWhite)
     }
 
-    getShortName(): String {return 'Kg'}
+    getShortName(): string {
+        return 'K'
+    }
 }

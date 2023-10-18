@@ -15,8 +15,9 @@ export default function Home({}: HomeProps) {
         if (game.verifyMove(pieceToMove, newPosition)) {
             game.executeMove(pieceToMove, newPosition)
             game.calculateThreats()
+            game.calculateKingsMoves()
         }
-        console.log(game.moveList)
+        console.log(game)
     }
 
     return (

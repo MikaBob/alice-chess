@@ -56,5 +56,7 @@ export class Tower extends Piece {
         return new Tower(this.isWhite)
     }
 
-    getShortName(): String {return 'R'}
+    getShortName(): string {
+        return 'R'
+    }
 }

@@ -32,7 +32,7 @@ export default class Piece {
             this.possibleMoves.push(square.position)
             square.isThreatenBy.push(this)
         }
-        return square.piece !== null && square.piece.type !== 'King' // ignore kings to continue threats behind him
+        return !(square.piece === null || (square.piece.type === 'King' && square.piece.isWhite !== this.isWhite)) // ignore enemy king to continue threats behind him
     }
 
     checkBoundariesAndOppositeBoard(rowToCheck: number, columnToCheck: number, oppositeBoard: Square[][]): boolean {
@@ -59,7 +59,7 @@ export default class Piece {
         return clone
     }
 
-    getShortName(): String {
+    getShortName(): string {
         throw new Error(`Piece ${this.type} must extend function getShortName()!`)
     }
 }

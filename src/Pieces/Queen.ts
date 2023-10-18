@@ -100,5 +100,7 @@ export class Queen extends Piece {
         return new Queen(this.isWhite)
     }
 
-    getShortName(): String {return 'Q'}
+    getShortName(): string {
+        return 'Q'
+    }
 }

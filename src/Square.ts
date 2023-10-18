@@ -31,4 +31,12 @@ export default class Square {
         }
         return true
     }
+
+    public isThreatenByColor(colorTrueForWhiteAndFalseForBlack: boolean): boolean {
+        return this.isThreatenBy.find((piece: Piece) => piece.isWhite === colorTrueForWhiteAndFalseForBlack) !== undefined
+    }
+
+    public isEmptyAndNotThreatenByColor(colorTrueForWhiteAndFalseForBlack: boolean): boolean {
+        return this.piece === null && this.isThreatenBy.find((piece: Piece) => piece.isWhite === colorTrueForWhiteAndFalseForBlack) !== undefined
+    }
 }

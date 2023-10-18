@@ -64,5 +64,7 @@ export class Bishop extends Piece {
         return new Bishop(this.isWhite)
     }
 
-    getShortName(): String {return 'B'}
+    getShortName(): string {
+        return 'B'
+    }
 }

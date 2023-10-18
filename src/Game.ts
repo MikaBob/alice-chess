@@ -4,7 +4,7 @@ import { Knight } from './Pieces/Knight'
 import { PAWN_INITIAL_ROW_BLACK, PAWN_INITIAL_ROW_WHITE, Pawn } from './Pieces/Pawn'
 import Piece from './Pieces/Piece'
 import { Queen } from './Pieces/Queen'
-import { Tower } from './Pieces/Tower'
+import { PIECE_TYPE_TOWER, Tower } from './Pieces/Tower'
 import Square from './Square'
 import { fromPositionToCoordinates, Position, isPositionInList } from './Utils'
 
@@ -15,7 +15,7 @@ export default class Game {
     board: Square[][]
     secondBoard: Square[][]
     isWhiteTurnToPlay: boolean
-    moveList: String[]
+    moveList: string[]
 
     constructor() {
         this.board = []
@@ -70,49 +70,58 @@ export default class Game {
             this.board[PAWN_INITIAL_ROW_WHITE][i].setPieceOnSquare(new Pawn(true))
         }
         this.calculateThreats()
+        this.addCastlingAsPossibleMoves()
     }
 
     public verifyMove(pieceToMove: Piece, positionTo: Position): boolean {
         if (pieceToMove.isWhite === this.isWhiteTurnToPlay && isPositionInList(positionTo, pieceToMove.possibleMoves)) {
-            // Kings can't move on a square threaten by an enemy
-            if (pieceToMove.type === PIECE_TYPE_KING) {
-                const kingsCurrentBoard: Square[][] = pieceToMove.isOnMainBoard ? this.board : this.secondBoard
-                const piecesThreateningKingsNewPosition: Piece[] = kingsCurrentBoard[positionTo.row][positionTo.column].isThreatenBy
-                //console.log((pieceToMove.isWhite ? 'white' : 'black') + ' king is moving', piecesThreateningKingsNewPosition)
-                for (let i = 0; i < piecesThreateningKingsNewPosition.length; i++) {
-                    if (piecesThreateningKingsNewPosition[i].isWhite !== pieceToMove.isWhite) {
-                        return false
-                    }
-                }
-            }
-
-            let tmpGame: Game | null = this.cloneGame()
-            const tmpPieceToMove: Piece = pieceToMove.clone()
+            let tmpGame: Game = this.cloneGame()
+            const tmpPieceToMove: Piece = pieceToMove.isOnMainBoard
+                ? (tmpGame.board[pieceToMove.position.row][pieceToMove.position.column].piece as Piece)
+                : (tmpGame.secondBoard[pieceToMove.position.row][pieceToMove.position.column].piece as Piece)
             tmpGame.executeMove(tmpPieceToMove, positionTo)
             tmpGame.isWhiteTurnToPlay = !tmpGame.isWhiteTurnToPlay // cancel changing turns
             tmpGame.calculateThreats()
-            if (tmpGame.isKingUnderThreat()) {
-                tmpGame = null
-            }
-            return tmpGame !== null
+            return !tmpGame.isKingUnderThreat()
         }
         return false
     }
 
     public executeMove(pieceToMove: Piece, positionTo: Position): void {
-        //console.log('before', pieceToMove.isWhite, this.isWhiteTurnToPlay, this.board[pieceToMove.position.row][pieceToMove.position.column], positionTo, pieceToMove, this.isWhiteTurnToPlay);
+        let boardName = 'M'
+        let deltaOfHorizontalSquares = pieceToMove.position.column - positionTo.column
+        let moveName =
+            boardName +
+            pieceToMove.getShortName() +
+            fromPositionToCoordinates(pieceToMove.position).toLowerCase() +
+            (this.board[positionTo.row][positionTo.column].piece === null ? '-' : 'x') +
+            fromPositionToCoordinates(positionTo).toLowerCase()
+
+        this.board[pieceToMove.position.row][pieceToMove.position.column].setPieceOnSquare(null) // empty square where it currently stands
         if (pieceToMove.isOnMainBoard) {
-            this.board[pieceToMove.position.row][pieceToMove.position.column].setPieceOnSquare(null)
-            this.board[positionTo.row][positionTo.column].setPieceOnSquare(null)
-            this.secondBoard[positionTo.row][positionTo.column].setPieceOnSquare(pieceToMove)
+            this.board[positionTo.row][positionTo.column].setPieceOnSquare(null) // empty square  where it will go
+            this.secondBoard[positionTo.row][positionTo.column].setPieceOnSquare(pieceToMove) // move piece on the other board
         } else {
-            this.secondBoard[pieceToMove.position.row][pieceToMove.position.column].setPieceOnSquare(null)
-            this.secondBoard[positionTo.row][positionTo.column].setPieceOnSquare(null)
-            this.board[positionTo.row][positionTo.column].setPieceOnSquare(pieceToMove)
+            this.secondBoard[pieceToMove.position.row][pieceToMove.position.column].setPieceOnSquare(null) // empty square where it currently stands
+            boardName = 'S'
+            this.secondBoard[positionTo.row][positionTo.column].setPieceOnSquare(null) // empty square where it will go
+            this.board[positionTo.row][positionTo.column].setPieceOnSquare(pieceToMove) // move piece on the other board
         }
-        this.moveList.push(pieceToMove.getShortName()+fromPositionToCoordinates(positionTo).toLowerCase())
+
+        // for castling, move also the tower
+        if (pieceToMove.type === PIECE_TYPE_KING) {
+            // a king moving by 2 squares can only be castling
+            if (Math.abs(deltaOfHorizontalSquares) > 1) {
+                let isBigCastle: boolean = deltaOfHorizontalSquares > 0 // positif = left of the king = big castling
+                let tower: Tower = this.board[pieceToMove.position.row][isBigCastle ? 0 : 7].piece as Tower
+                this.board[tower.position.row][tower.position.column].setPieceOnSquare(null) // empty square where tower currently stands
+                this.secondBoard[tower.position.row][isBigCastle ? 3 : 5].setPieceOnSquare(tower) // move piece on the other board
+                moveName = isBigCastle ? 'O-O-O' : 'O-O'
+            }
+        }
+
+        this.moveList.push(moveName) // write history
         this.isWhiteTurnToPlay = !this.isWhiteTurnToPlay
-        //console.log('after', pieceToMove.isWhite, this.isWhiteTurnToPlay, this.board[pieceToMove.position.row][pieceToMove.position.column], positionTo, pieceToMove, this.isWhiteTurnToPlay);
     }
 
     public calculateThreats(): void {
@@ -153,12 +162,96 @@ export default class Game {
         return false
     }
 
+    public calculateKingsMoves(): void {
+        this.getKingOfColor(this.isWhiteTurnToPlay)?.calculatePossibleMoves(this) // re-calculate after calculating threats to prevent showing kings move to threaten squares
+        this.addCastlingAsPossibleMoves()
+    }
+
+    private addCastlingAsPossibleMoves() {
+        let bigCastlePossible = true
+        let smallCastlePossible = true
+
+        // check if king / tower haven't move in the game
+        if (this.isWhiteTurnToPlay) {
+            this.moveList.forEach((move: string) => {
+                if (move.indexOf('MRa1') !== -1) bigCastlePossible = false
+                if (move.indexOf('MRh1') !== -1) smallCastlePossible = false
+                if (move.indexOf('MKe1') !== -1) {
+                    bigCastlePossible = false
+                    smallCastlePossible = false
+                }
+            })
+        } else {
+            this.moveList.forEach((move: string) => {
+                if (move.indexOf('MRa8') !== -1) bigCastlePossible = false
+                if (move.indexOf('MRh8') !== -1) smallCastlePossible = false
+                if (move.indexOf('MKe8') !== -1) {
+                    bigCastlePossible = false
+                    smallCastlePossible = false
+                }
+            })
+        }
+
+        let king: King = this.getKingOfColor(this.isWhiteTurnToPlay) as King
+        if (!king) throw new Error(`Could not find black king!`)
+
+        const rowToCheck = this.isWhiteTurnToPlay ? 7 : 0
+        if (king && king.position.row === rowToCheck && king.position.column === 4) {
+            // check if squares are free in the main board and are not under threat on both boards
+            let towerLeft: Piece | null = this.board[rowToCheck][0].piece
+            if (
+                bigCastlePossible &&
+                towerLeft &&
+                towerLeft.type === PIECE_TYPE_TOWER &&
+                towerLeft.isWhite === this.isWhiteTurnToPlay &&
+                this.board[rowToCheck][1].piece === null &&
+                !this.board[rowToCheck][2].isEmptyAndNotThreatenByColor(!this.isWhiteTurnToPlay) &&
+                !this.board[rowToCheck][3].isEmptyAndNotThreatenByColor(!this.isWhiteTurnToPlay) &&
+                !this.secondBoard[rowToCheck][2].isEmptyAndNotThreatenByColor(!this.isWhiteTurnToPlay) &&
+                !this.secondBoard[rowToCheck][3].isEmptyAndNotThreatenByColor(!this.isWhiteTurnToPlay)
+            ) {
+                bigCastlePossible = true
+            } else bigCastlePossible = false
+
+            let towerRight: Piece | null = this.board[rowToCheck][7].piece
+            if (
+                smallCastlePossible &&
+                towerRight &&
+                towerRight.type === PIECE_TYPE_TOWER &&
+                towerRight.isWhite === this.isWhiteTurnToPlay &&
+                !this.board[rowToCheck][6].isEmptyAndNotThreatenByColor(!this.isWhiteTurnToPlay) &&
+                !this.board[rowToCheck][5].isEmptyAndNotThreatenByColor(!this.isWhiteTurnToPlay) &&
+                !this.secondBoard[rowToCheck][6].isEmptyAndNotThreatenByColor(!this.isWhiteTurnToPlay) &&
+                !this.secondBoard[rowToCheck][5].isEmptyAndNotThreatenByColor(!this.isWhiteTurnToPlay)
+            ) {
+                smallCastlePossible = true
+            } else smallCastlePossible = false
+        } else {
+            bigCastlePossible = false
+            smallCastlePossible = false
+        }
+
+        if (bigCastlePossible) king.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(this.board[rowToCheck][2])
+        if (smallCastlePossible) king.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(this.board[rowToCheck][6])
+    }
+
+    public getKingOfColor(ofColorWhite: boolean): King | null {
+        for (let i = 0; i < BOARD_ROWS; i++) {
+            for (let j = 0; j < BOARD_COLUMNS; j++) {
+                if (this.board[i][j].piece !== null) if (this.board[i][j].piece?.type === PIECE_TYPE_KING && this.board[i][j].piece?.isWhite === ofColorWhite) return this.board[i][j].piece
+                if (this.secondBoard[i][j].piece !== null)
+                    if (this.secondBoard[i][j].piece?.type === PIECE_TYPE_KING && this.secondBoard[i][j].piece?.isWhite === ofColorWhite) return this.secondBoard[i][j].piece
+            }
+        }
+        return null
+    }
+
     public cloneGame(): Game {
         const clone: Game = new Game()
         for (let i = 0; i < BOARD_ROWS; i++) {
             for (let j = 0; j < BOARD_COLUMNS; j++) {
-                clone.board[i][j].setPieceOnSquare(this.board[i][j].piece)
-                clone.secondBoard[i][j].setPieceOnSquare(this.secondBoard[i][j].piece)
+                clone.board[i][j].setPieceOnSquare(this.board[i][j].piece ? (this.board[i][j].piece as Piece).clone() : null)
+                clone.secondBoard[i][j].setPieceOnSquare(this.secondBoard[i][j].piece ? (this.secondBoard[i][j].piece as Piece).clone() : null)
             }
         }
 
