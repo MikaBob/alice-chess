@@ -1,6 +1,6 @@
 import Game from '../Game'
-import Square from '../Square'
 import Piece from './Piece'
+import Square from '../Square'
 
 export const PIECE_TYPE_KING = 'King'
 

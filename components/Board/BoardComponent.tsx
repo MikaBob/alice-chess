@@ -1,8 +1,8 @@
+import { callBackExecuteMoveType } from '@/pages'
+import { useGameContext } from '@/context/GameContext'
 import Square from '@/src/Square'
 import styles from './board.module.css'
 import TileComponent from '../Tile/TileComponent'
-import { useGameContext } from '@/context/GameContext'
-import { callBackExecuteMoveType } from '@/pages'
 
 interface BoardProps {
     isMainBoard?: boolean

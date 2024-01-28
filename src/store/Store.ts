@@ -1,6 +1,6 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit'
-import { dragNDropSlice } from './DragNDropSlice'
 import { createWrapper } from 'next-redux-wrapper'
+import { dragNDropSlice } from './DragNDropSlice'
 
 const makeStore = () =>
     configureStore({

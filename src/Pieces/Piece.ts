@@ -1,8 +1,8 @@
 //import fs from 'fs';
 
+import { Position } from '../Utils'
 import Game, { BOARD_COLUMNS, BOARD_ROWS } from '../Game'
 import Square from '../Square'
-import { Position } from '../Utils'
 
 export default class Piece {
     type: string

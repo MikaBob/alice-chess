@@ -1,5 +1,5 @@
-import Game from '@/src/Game'
 import { ReactNode, createContext, useContext, useState } from 'react'
+import Game from '@/src/Game'
 
 type GameContextType = {
     game: Game

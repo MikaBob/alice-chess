@@ -1,5 +1,5 @@
-import { MODAL_ROOT_ELEMENT_ID } from '@/components/ModalPromotion/ModalPromotionComponent'
 import { Html, Head, Main, NextScript } from 'next/document'
+import { MODAL_ROOT_ELEMENT_ID } from '@/components/ModalPromotion/ModalPromotionComponent'
 
 export default function Document() {
     return (

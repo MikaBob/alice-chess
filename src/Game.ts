@@ -1,12 +1,12 @@
-import { King, PIECE_TYPE_KING } from './Pieces/King'
-import { PAWN_INITIAL_ROW_BLACK, PAWN_INITIAL_ROW_WHITE, Pawn } from './Pieces/Pawn'
-import Piece from './Pieces/Piece'
-import { PIECE_TYPE_TOWER, Tower } from './Pieces/Tower'
-import Square from './Square'
-import { fromPositionToCoordinates, Position, isPositionInList, getNewPieceFromShortName, getNewPieceFromName, fromCoordinatesToPosition } from './Utils'
 import { Bishop } from './Pieces/Bishop'
+import { fromPositionToCoordinates, Position, isPositionInList, getNewPieceFromShortName, getNewPieceFromName, fromCoordinatesToPosition } from './Utils'
+import { King, PIECE_TYPE_KING } from './Pieces/King'
 import { Knight } from './Pieces/Knight'
+import { PAWN_INITIAL_ROW_BLACK, PAWN_INITIAL_ROW_WHITE, Pawn } from './Pieces/Pawn'
+import { PIECE_TYPE_TOWER, Tower } from './Pieces/Tower'
 import { Queen } from './Pieces/Queen'
+import Piece from './Pieces/Piece'
+import Square from './Square'
 
 export const BOARD_ROWS = 8
 export const BOARD_COLUMNS = 8

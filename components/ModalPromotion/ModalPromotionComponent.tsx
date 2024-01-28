@@ -1,7 +1,7 @@
 import { Pawn } from '@/src/Pieces/Pawn'
 import Image from 'next/image'
 import Piece from '@/src/Pieces/Piece'
-import React, { ReactNode } from 'react'
+import React from 'react'
 import ReactDOM from 'react-dom'
 import styles from './modalPromotion.module.css'
 

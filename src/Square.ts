@@ -1,5 +1,5 @@
-import Piece from './Pieces/Piece'
 import { Position } from './Utils'
+import Piece from './Pieces/Piece'
 
 export default class Square {
     isWhite: boolean

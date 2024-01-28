@@ -1,9 +1,9 @@
-import Image from 'next/image'
-import Piece from '@/src/Pieces/Piece'
-import styles from './piece.module.css'
 import { DragEventHandler } from 'react'
 import { fromPositionToCoordinates } from '@/src/Utils'
 import { useGameContext } from '@/context/GameContext'
+import Image from 'next/image'
+import Piece from '@/src/Pieces/Piece'
+import styles from './piece.module.css'
 
 interface PieceProps {
     piece: Piece

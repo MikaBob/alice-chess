@@ -1,14 +1,14 @@
-import Game from '../Game'
-import Square from '../Square'
 import { Bishop } from './Bishop'
 import { Knight } from './Knight'
-import Piece from './Piece'
 import { Queen } from './Queen'
 import { Tower } from './Tower'
+import Game from '../Game'
+import Piece from './Piece'
+import Square from '../Square'
 
 export const PIECE_TYPE_PAWN = 'Pawn'
 export const PAWN_INITIAL_ROW_WHITE = 6
-export const PAWN_INITIAL_ROW_BLACK = 5
+export const PAWN_INITIAL_ROW_BLACK = 1
 
 export class Pawn extends Piece {
     constructor(isWhite: boolean) {
