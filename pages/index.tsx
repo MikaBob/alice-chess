@@ -1,18 +1,36 @@
-import Head from 'next/head'
-import styles from './index.module.css'
-import BoardComponent from '@/components/Board/BoardComponent'
-import Piece from '@/src/Pieces/Piece'
-import { useState } from 'react'
-import { Position, fromPositionToCoordinates } from '@/src/Utils'
+import { PIECE_TYPE_PAWN, Pawn } from '@/src/Pieces/Pawn'
+import { Position } from '@/src/Utils'
 import { useGameContext } from '@/context/GameContext'
+import { useState } from 'react'
+import BoardComponent from '@/components/Board/BoardComponent'
+import Head from 'next/head'
+import ModalPromotionComponent, { ModalPromotionParametersType } from '@/components/ModalPromotion/ModalPromotionComponent'
+import Piece from '@/src/Pieces/Piece'
+import styles from './index.module.css'
 
 interface HomeProps {}
 
+export type callBackExecuteMoveType = (pieceToMove: Piece, newPosition: Position) => void;
+
+
 export default function Home({}: HomeProps) {
     const { game } = useGameContext()
+    const [modalPromotionParameters, setModalPromotionParameters] = useState({
+        isVisible: false,
+        pawnToPromote: null
+    } as ModalPromotionParametersType)
 
-    const callBackExecuteMove = (pieceToMove: Piece, newPosition: Position) => {
+    const callBackExecuteMove: callBackExecuteMoveType = (pieceToMove: Piece, newPosition: Position) => {
         if (game.verifyMove(pieceToMove, newPosition)) {
+            if(
+                pieceToMove.type === PIECE_TYPE_PAWN 
+                && (
+                    (game.isWhiteTurnToPlay && newPosition.row === 0)
+                    || (!game.isWhiteTurnToPlay && newPosition.row === 7)
+                )
+            ){
+                setModalPromotionParameters({isVisible: true, pawnToPromote: pieceToMove as Pawn})
+            }
             game.executeMove(pieceToMove, newPosition)
             game.calculateThreats()
             game.calculateKingsMoves()
@@ -20,6 +38,11 @@ export default function Home({}: HomeProps) {
         console.log(game)
     }
 
+    const modalPromotionClosed = (pieceSelected: string) => {
+        game.promotePawn(modalPromotionParameters.pawnToPromote as Pawn, pieceSelected)
+        setModalPromotionParameters({isVisible: false, pawnToPromote: null})
+    }
+    
     return (
         <>
             <Head>
@@ -33,6 +56,12 @@ export default function Home({}: HomeProps) {
                     <BoardComponent isMainBoard={true} callBackExecuteMove={callBackExecuteMove} />
                     <BoardComponent callBackExecuteMove={callBackExecuteMove} />
                 </div>
+                {modalPromotionParameters.isVisible && 
+                    <ModalPromotionComponent 
+                        onClose={modalPromotionClosed} 
+                        pawnToPromote={modalPromotionParameters.pawnToPromote as Pawn} 
+                    />
+                }
             </main>
         </>
     )

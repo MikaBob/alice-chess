@@ -1,17 +1,17 @@
+import { callBackExecuteMoveType } from '@/pages'
+import { DragNDropState, selectDragNDropState, setDragNDropState } from '../../src/store/DragNDropSlice'
+import { Position, arePositionsIdentical, fromCoordinatesToPosition, fromPositionToCoordinates, isPositionInList } from '@/src/Utils'
+import { useDispatch, useSelector } from 'react-redux'
+import { useGameContext } from '@/context/GameContext'
 import Image from 'next/image'
+import Piece from '@/src/Pieces/Piece'
 import PieceComponent from '../Piece/PieceComponent'
 import Square from '@/src/Square'
 import styles from './tile.module.css'
-import { Position, arePositionsIdentical, fromCoordinatesToPosition, fromPositionToCoordinates, isPositionInList } from '@/src/Utils'
-import { useState } from 'react'
-import Piece from '@/src/Pieces/Piece'
-import { useGameContext } from '@/context/GameContext'
-import { DragNDropState, selectDragNDropState, setDragNDropState } from '../../src/store/DragNDropSlice'
-import { useDispatch, useSelector } from 'react-redux'
 
 interface TileProps {
     square: Square
-    callBackExecuteMove: any
+    callBackExecuteMove: callBackExecuteMoveType
 }
 
 export default function TileComponent({ square, callBackExecuteMove }: TileProps) {
@@ -73,7 +73,7 @@ export default function TileComponent({ square, callBackExecuteMove }: TileProps
         } */
     }
 
-    function onDragOver(e: any) {
+    function onDragOver(e: React.DragEvent<HTMLDivElement>) {
         e.preventDefault()
         e.dataTransfer.effectAllowed = 'move'
         e.dataTransfer.dropEffect = 'move'

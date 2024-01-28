@@ -1,9 +1,10 @@
-import { Bishop } from './Pieces/Bishop'
+import { Deferred } from 'next/dist/server/image-optimizer'
+import { Bishop, PIECE_TYPE_BISHOP } from './Pieces/Bishop'
 import { King, PIECE_TYPE_KING } from './Pieces/King'
-import { Knight } from './Pieces/Knight'
-import { PAWN_INITIAL_ROW_BLACK, PAWN_INITIAL_ROW_WHITE, Pawn } from './Pieces/Pawn'
+import { Knight, PIECE_TYPE_KNIGHT } from './Pieces/Knight'
+import { PAWN_INITIAL_ROW_BLACK, PAWN_INITIAL_ROW_WHITE, PIECE_TYPE_PAWN, Pawn } from './Pieces/Pawn'
 import Piece from './Pieces/Piece'
-import { Queen } from './Pieces/Queen'
+import { PIECE_TYPE_QUEEN, Queen } from './Pieces/Queen'
 import { PIECE_TYPE_TOWER, Tower } from './Pieces/Tower'
 import Square from './Square'
 import { fromPositionToCoordinates, Position, isPositionInList } from './Utils'
@@ -36,8 +37,7 @@ export default class Game {
     }
 
     public initChessSet() {
-        // black
-        this.board[0][0].setPieceOnSquare(new Tower(false))
+        /*         this.board[0][0].setPieceOnSquare(new Tower(false))
         this.board[0][7].setPieceOnSquare(new Tower(false))
 
         this.board[0][1].setPieceOnSquare(new Knight(false))
@@ -46,15 +46,15 @@ export default class Game {
         this.board[0][2].setPieceOnSquare(new Bishop(false))
         this.board[0][5].setPieceOnSquare(new Bishop(false))
 
-        this.board[0][3].setPieceOnSquare(new Queen(false))
+        this.board[0][3].setPieceOnSquare(new Queen(false)) */
         this.board[0][4].setPieceOnSquare(new King(false))
 
-        for (let i = 0; i < BOARD_COLUMNS; i++) {
+        /*         for (let i = 0; i < BOARD_COLUMNS; i++) {
             this.board[PAWN_INITIAL_ROW_BLACK][i].setPieceOnSquare(new Pawn(false))
-        }
+        } */
 
         // white
-        this.board[7][0].setPieceOnSquare(new Tower(true))
+        /*         this.board[7][0].setPieceOnSquare(new Tower(true))
         this.board[7][7].setPieceOnSquare(new Tower(true))
 
         this.board[7][1].setPieceOnSquare(new Knight(true))
@@ -63,7 +63,7 @@ export default class Game {
         this.board[7][2].setPieceOnSquare(new Bishop(true))
         this.board[7][5].setPieceOnSquare(new Bishop(true))
 
-        this.board[7][3].setPieceOnSquare(new Queen(true))
+        this.board[7][3].setPieceOnSquare(new Queen(true)) */
         this.board[7][4].setPieceOnSquare(new King(true))
 
         for (let i = 0; i < BOARD_COLUMNS; i++) {
@@ -91,21 +91,20 @@ export default class Game {
         let boardName = 'M'
         let deltaOfHorizontalSquares = pieceToMove.position.column - positionTo.column
         let moveName =
-            boardName +
             pieceToMove.getShortName() +
             fromPositionToCoordinates(pieceToMove.position).toLowerCase() +
             (this.board[positionTo.row][positionTo.column].piece === null ? '-' : 'x') +
             fromPositionToCoordinates(positionTo).toLowerCase()
 
-        this.board[pieceToMove.position.row][pieceToMove.position.column].setPieceOnSquare(null) // empty square where it currently stands
         if (pieceToMove.isOnMainBoard) {
+            this.board[pieceToMove.position.row][pieceToMove.position.column].setPieceOnSquare(null) // empty square where it currently stands
             this.board[positionTo.row][positionTo.column].setPieceOnSquare(null) // empty square  where it will go
             this.secondBoard[positionTo.row][positionTo.column].setPieceOnSquare(pieceToMove) // move piece on the other board
         } else {
             this.secondBoard[pieceToMove.position.row][pieceToMove.position.column].setPieceOnSquare(null) // empty square where it currently stands
-            boardName = 'S'
             this.secondBoard[positionTo.row][positionTo.column].setPieceOnSquare(null) // empty square where it will go
             this.board[positionTo.row][positionTo.column].setPieceOnSquare(pieceToMove) // move piece on the other board
+            boardName = 'S'
         }
 
         // for castling, move also the tower
@@ -120,7 +119,7 @@ export default class Game {
             }
         }
 
-        this.moveList.push(moveName) // write history
+        this.moveList.push(boardName + moveName) // write history
         this.isWhiteTurnToPlay = !this.isWhiteTurnToPlay
     }
 
@@ -257,5 +256,45 @@ export default class Game {
 
         clone.isWhiteTurnToPlay = this.isWhiteTurnToPlay ? true : false
         return clone
+    }
+
+    public cancelLastMove(): void {
+        console.log('TODO: Cancel move')
+    }
+
+    public promotePawn(pawnToPromote: Pawn, pieceNameToPromoteTo: string): void {
+        let newPiece: Piece
+        switch (pieceNameToPromoteTo) {
+            case PIECE_TYPE_KNIGHT:
+                newPiece = new Knight(pawnToPromote.isWhite)
+                break
+            case PIECE_TYPE_BISHOP:
+                newPiece = new Bishop(pawnToPromote.isWhite)
+                break
+            case PIECE_TYPE_TOWER:
+                newPiece = new Tower(pawnToPromote.isWhite)
+                break
+            case PIECE_TYPE_QUEEN:
+                newPiece = new Queen(pawnToPromote.isWhite)
+                break
+            default:
+                this.cancelLastMove()
+                return
+        }
+
+        newPiece.position = pawnToPromote.position
+        newPiece.isOnMainBoard = pawnToPromote.isOnMainBoard
+
+        if (newPiece.isOnMainBoard) {
+            this.board[newPiece.position.row][newPiece.position.column].setPieceOnSquare(newPiece)
+        } else {
+            this.secondBoard[newPiece.position.row][newPiece.position.column].setPieceOnSquare(newPiece)
+        }
+
+        const previousMove: string = this.moveList.pop() as string // remove pawn's move from the list
+        this.moveList.push(previousMove + '=' + newPiece.getShortName()) // add promotion notation
+
+        this.calculateThreats()
+        this.calculateKingsMoves()
     }
 }

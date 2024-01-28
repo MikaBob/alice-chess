@@ -1,6 +1,10 @@
 import Game from '../Game'
 import Square from '../Square'
+import { Bishop } from './Bishop'
+import { Knight } from './Knight'
 import Piece from './Piece'
+import { Queen } from './Queen'
+import { Tower } from './Tower'
 
 export const PIECE_TYPE_PAWN = 'Pawn'
 export const PAWN_INITIAL_ROW_WHITE = 6
@@ -88,6 +92,10 @@ export class Pawn extends Piece {
                 }
             }
         }
+    }
+
+    getPossiblePromotions(): Piece[] {
+        return [new Knight(this.isWhite), new Bishop(this.isWhite), new Tower(this.isWhite), new Queen(this.isWhite)]
     }
 
     createNewPieceOfSameType(): Pawn {
