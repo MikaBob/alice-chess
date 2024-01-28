@@ -8,7 +8,7 @@ import { Tower } from './Tower'
 
 export const PIECE_TYPE_PAWN = 'Pawn'
 export const PAWN_INITIAL_ROW_WHITE = 6
-export const PAWN_INITIAL_ROW_BLACK = 1
+export const PAWN_INITIAL_ROW_BLACK = 5
 
 export class Pawn extends Piece {
     constructor(isWhite: boolean) {

@@ -1,16 +1,24 @@
-import { Deferred } from 'next/dist/server/image-optimizer'
-import { Bishop, PIECE_TYPE_BISHOP } from './Pieces/Bishop'
 import { King, PIECE_TYPE_KING } from './Pieces/King'
-import { Knight, PIECE_TYPE_KNIGHT } from './Pieces/Knight'
-import { PAWN_INITIAL_ROW_BLACK, PAWN_INITIAL_ROW_WHITE, PIECE_TYPE_PAWN, Pawn } from './Pieces/Pawn'
+import { PAWN_INITIAL_ROW_BLACK, PAWN_INITIAL_ROW_WHITE, Pawn } from './Pieces/Pawn'
 import Piece from './Pieces/Piece'
-import { PIECE_TYPE_QUEEN, Queen } from './Pieces/Queen'
 import { PIECE_TYPE_TOWER, Tower } from './Pieces/Tower'
 import Square from './Square'
-import { fromPositionToCoordinates, Position, isPositionInList } from './Utils'
+import { fromPositionToCoordinates, Position, isPositionInList, getNewPieceFromShortName, getNewPieceFromName, fromCoordinatesToPosition } from './Utils'
+import { Bishop } from './Pieces/Bishop'
+import { Knight } from './Pieces/Knight'
+import { Queen } from './Pieces/Queen'
 
 export const BOARD_ROWS = 8
 export const BOARD_COLUMNS = 8
+
+export type RegexParseMoveResult = {
+    board: string
+    piece: string | null
+    from: string
+    action: string
+    to: string
+    promotion: string | null
+}
 
 export default class Game {
     board: Square[][]
@@ -37,7 +45,7 @@ export default class Game {
     }
 
     public initChessSet() {
-        /*         this.board[0][0].setPieceOnSquare(new Tower(false))
+        this.board[0][0].setPieceOnSquare(new Tower(false))
         this.board[0][7].setPieceOnSquare(new Tower(false))
 
         this.board[0][1].setPieceOnSquare(new Knight(false))
@@ -46,15 +54,15 @@ export default class Game {
         this.board[0][2].setPieceOnSquare(new Bishop(false))
         this.board[0][5].setPieceOnSquare(new Bishop(false))
 
-        this.board[0][3].setPieceOnSquare(new Queen(false)) */
+        this.board[0][3].setPieceOnSquare(new Queen(false))
         this.board[0][4].setPieceOnSquare(new King(false))
 
-        /*         for (let i = 0; i < BOARD_COLUMNS; i++) {
+        for (let i = 0; i < BOARD_COLUMNS; i++) {
             this.board[PAWN_INITIAL_ROW_BLACK][i].setPieceOnSquare(new Pawn(false))
-        } */
+        }
 
         // white
-        /*         this.board[7][0].setPieceOnSquare(new Tower(true))
+        this.board[7][0].setPieceOnSquare(new Tower(true))
         this.board[7][7].setPieceOnSquare(new Tower(true))
 
         this.board[7][1].setPieceOnSquare(new Knight(true))
@@ -63,7 +71,7 @@ export default class Game {
         this.board[7][2].setPieceOnSquare(new Bishop(true))
         this.board[7][5].setPieceOnSquare(new Bishop(true))
 
-        this.board[7][3].setPieceOnSquare(new Queen(true)) */
+        this.board[7][3].setPieceOnSquare(new Queen(true))
         this.board[7][4].setPieceOnSquare(new King(true))
 
         for (let i = 0; i < BOARD_COLUMNS; i++) {
@@ -259,27 +267,45 @@ export default class Game {
     }
 
     public cancelLastMove(): void {
-        console.log('TODO: Cancel move')
+        if (this.moveList.length < 1) return
+
+        const moveListInReverse: string[] = this.moveList.toReversed()
+        const lastMove: string = moveListInReverse.shift() as string
+
+        const regexParseMove: RegExp = /^(?<board>M|S)(?<piece>K|N|Q|R|B)?(?<from>[a-h][1-8])(?<action>-|x)(?<to>[a-h][1-8])=?(?<promotion>N|Q|R|B)?$/
+        const { board, piece, from, action, to, promotion } = regexParseMove.exec(lastMove)?.groups as RegexParseMoveResult
+
+        const lastMoveWasOnMainBoard = board === 'M'
+        const initialPositionOfLastMove: Position = fromCoordinatesToPosition(from)
+        const finalPositionOfLastMove: Position = fromCoordinatesToPosition(to)
+
+        if (lastMoveWasOnMainBoard) {
+            this.board[initialPositionOfLastMove.row][initialPositionOfLastMove.column].setPieceOnSquare(this.secondBoard[finalPositionOfLastMove.row][finalPositionOfLastMove.column].piece)
+            this.secondBoard[finalPositionOfLastMove.row][finalPositionOfLastMove.column].setPieceOnSquare(null)
+        } else {
+            this.secondBoard[initialPositionOfLastMove.row][initialPositionOfLastMove.column].setPieceOnSquare(this.board[finalPositionOfLastMove.row][finalPositionOfLastMove.column].piece)
+            this.board[finalPositionOfLastMove.row][finalPositionOfLastMove.column].setPieceOnSquare(null)
+        }
+
+        this.moveList.pop()
+        this.calculateThreats()
+        this.calculateKingsMoves()
+        this.isWhiteTurnToPlay = !this.isWhiteTurnToPlay
+
+        /* 
+        @TODO
+        take back
+            eating
+            promoting
+        */
     }
 
     public promotePawn(pawnToPromote: Pawn, pieceNameToPromoteTo: string): void {
-        let newPiece: Piece
-        switch (pieceNameToPromoteTo) {
-            case PIECE_TYPE_KNIGHT:
-                newPiece = new Knight(pawnToPromote.isWhite)
-                break
-            case PIECE_TYPE_BISHOP:
-                newPiece = new Bishop(pawnToPromote.isWhite)
-                break
-            case PIECE_TYPE_TOWER:
-                newPiece = new Tower(pawnToPromote.isWhite)
-                break
-            case PIECE_TYPE_QUEEN:
-                newPiece = new Queen(pawnToPromote.isWhite)
-                break
-            default:
-                this.cancelLastMove()
-                return
+        let newPiece: Piece | null = getNewPieceFromName(pieceNameToPromoteTo, pawnToPromote.isWhite)
+
+        if (newPiece === null) {
+            this.cancelLastMove()
+            return
         }
 
         newPiece.position = pawnToPromote.position
