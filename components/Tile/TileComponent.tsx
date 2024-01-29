@@ -89,14 +89,14 @@ export default function TileComponent({ square, callBackExecuteMove }: TileProps
             }
         }
     }
-    const isPieceAboveTile: boolean = dragNDropState.isDragging ? coordinates === dragNDropState.hoveredCoordinates : false
-    const isTileUnderThreat: boolean = square.isThreatenBy.length > 0
+    const isDraggedPieceAboveTile: boolean = dragNDropState.isDragging ? coordinates === dragNDropState.hoveredCoordinates : false
+    const isKingUnderThreat: boolean = (square.piece?.type === 'King' && square.isThreatenByColor(!square.piece?.isWhite))
 
     let cssClasses: string = styles.tile
     cssClasses += isOriginalTileOfDraggedPiece ? ' ' + styles.pieceOriginalTile : ''
     cssClasses += isTileAPossiblePosition ? ' ' + styles.piecePossibleMoves : ''
-    cssClasses += isPieceAboveTile ? ' ' + styles.pieceDraggedOver : ''
-    cssClasses += isTileUnderThreat && square.piece?.type === 'King' ? ' ' + styles.tileUnderThreat : ''
+    cssClasses += isDraggedPieceAboveTile ? ' ' + styles.pieceDraggedOver : ''
+    cssClasses += isKingUnderThreat ? ' ' + styles.tileUnderThreat : ''
 
     return (
         <td>

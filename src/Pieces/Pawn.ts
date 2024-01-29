@@ -20,12 +20,9 @@ export class Pawn extends Piece {
      * It's is an exceptional move when an enemy is present
      * and normal moves do not eat other pieces, therefore are not threats
      */
-    pawnOverrideForAddSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(square: Square, isAnActualMove: boolean = true): boolean {
-        if (square.hasSquareAPieceOfDifferentColorOrIsEmpty(this)) {
-            if (isAnActualMove || (square.piece !== null && square.piece.isWhite !== this.isWhite)) this.possibleMoves.push(square.position)
-            else square.isThreatenBy.push(this)
-        }
-        return square.piece !== null
+    pawnOverrideForAddSquareToPossibleMove(square: Square, isAnActualMove: boolean = true): void {
+        if ((isAnActualMove && square.piece === null) || (!isAnActualMove && square.piece !== null && square.piece.isWhite !== this.isWhite)) this.possibleMoves.push(square.position)
+        if (!isAnActualMove) square.isThreatenBy.push(this)
     }
 
     calculatePossibleMoves(game: Game): void {
@@ -41,19 +38,19 @@ export class Pawn extends Piece {
             // North - 1 square
             rowToCheck--
             if (this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard) && currentBoard[rowToCheck][columnToCheck].piece === null) {
-                this.pawnOverrideForAddSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
+                this.pawnOverrideForAddSquareToPossibleMove(currentBoard[rowToCheck][columnToCheck])
             }
 
             // North-East
             columnToCheck++
-            if (this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard)) {
-                this.pawnOverrideForAddSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck], false)
+            if (this.checkBoundaries(rowToCheck, columnToCheck)) {
+                this.pawnOverrideForAddSquareToPossibleMove(currentBoard[rowToCheck][columnToCheck], false)
             }
 
             // North-West
             columnToCheck -= 2
-            if (this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard)) {
-                this.pawnOverrideForAddSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck], false)
+            if (this.checkBoundaries(rowToCheck, columnToCheck)) {
+                this.pawnOverrideForAddSquareToPossibleMove(currentBoard[rowToCheck][columnToCheck], false)
             }
 
             // North - 2 Squares
@@ -61,26 +58,26 @@ export class Pawn extends Piece {
                 rowToCheck--
                 columnToCheck = this.position.column
                 if (this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard) && currentBoard[rowToCheck][columnToCheck].piece === null) {
-                    this.pawnOverrideForAddSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
+                    this.pawnOverrideForAddSquareToPossibleMove(currentBoard[rowToCheck][columnToCheck])
                 }
             }
         } else {
             // South - 1 square
             rowToCheck++
             if (this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard) && currentBoard[rowToCheck][columnToCheck].piece === null) {
-                this.pawnOverrideForAddSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
+                this.pawnOverrideForAddSquareToPossibleMove(currentBoard[rowToCheck][columnToCheck])
             }
 
             // South-East
             columnToCheck++
-            if (this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard)) {
-                this.pawnOverrideForAddSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck], false)
+            if (this.checkBoundaries(rowToCheck, columnToCheck)) {
+                this.pawnOverrideForAddSquareToPossibleMove(currentBoard[rowToCheck][columnToCheck], false)
             }
 
             // South-West
             columnToCheck -= 2
-            if (this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard)) {
-                this.pawnOverrideForAddSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck], false)
+            if (this.checkBoundaries(rowToCheck, columnToCheck)) {
+                this.pawnOverrideForAddSquareToPossibleMove(currentBoard[rowToCheck][columnToCheck], false)
             }
 
             // South - 2 Squares
@@ -88,7 +85,7 @@ export class Pawn extends Piece {
                 rowToCheck++
                 columnToCheck = this.position.column
                 if (this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard) && currentBoard[rowToCheck][columnToCheck].piece === null) {
-                    this.pawnOverrideForAddSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
+                    this.pawnOverrideForAddSquareToPossibleMove(currentBoard[rowToCheck][columnToCheck])
                 }
             }
         }

@@ -33,10 +33,11 @@ export default function Home({}: HomeProps) {
             }
             game.executeMove(pieceToMove, newPosition)
             game.calculateThreats()
-            game.calculateKingsMoves()
         }
         console.log(game)
     }
+
+    console.log(game)
 
     const modalPromotionClosed = (pieceSelected: string) => {
         game.promotePawn(modalPromotionParameters.pawnToPromote as Pawn, pieceSelected)

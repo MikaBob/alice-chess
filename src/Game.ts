@@ -132,6 +132,7 @@ export default class Game {
     }
 
     public calculateThreats(): void {
+        console.log('calculateThreats')
         // reset all threats
         for (let i = 0; i < BOARD_ROWS; i++) {
             for (let j = 0; j < BOARD_COLUMNS; j++) {
@@ -142,10 +143,11 @@ export default class Game {
 
         for (let i = 0; i < BOARD_ROWS; i++) {
             for (let j = 0; j < BOARD_COLUMNS; j++) {
-                if (this.board[i][j].piece !== null) this.board[i][j].piece?.calculatePossibleMoves(this)
-                if (this.secondBoard[i][j].piece !== null) this.secondBoard[i][j].piece?.calculatePossibleMoves(this)
+                if (this.board[i][j].piece !== null && this.board[i][j].piece?.type !== PIECE_TYPE_KING) this.board[i][j].piece?.calculatePossibleMoves(this)
+                if (this.secondBoard[i][j].piece !== null && this.secondBoard[i][j].piece?.type !== PIECE_TYPE_KING) this.secondBoard[i][j].piece?.calculatePossibleMoves(this)
             }
         }
+        this.calculateKingsMoves()
     }
 
     public isKingUnderThreat(): boolean {
@@ -153,15 +155,21 @@ export default class Game {
             for (let j = 0; j < BOARD_COLUMNS; j++) {
                 if (this.board[i][j].piece !== null) {
                     if (this.board[i][j].piece?.type === PIECE_TYPE_KING && this.board[i][j].piece?.isWhite === this.isWhiteTurnToPlay && this.board[i][j].isThreatenBy.length > 0) {
-                        //console.log(`Check on ${this.board[i][j].piece?.isWhite ? 'white' : 'black'} king (Main board)`, this.board[i][j], this.secondBoard[i][j])
-                        return true
+                        for (const pieceThreatening of this.board[i][j].isThreatenBy) {
+                            if (pieceThreatening.isWhite !== this.board[i][j].piece?.isWhite) {
+                                return true
+                            }
+                        }
                     }
                 }
 
                 if (this.secondBoard[i][j].piece !== null) {
                     if (this.secondBoard[i][j].piece?.type === PIECE_TYPE_KING && this.secondBoard[i][j].piece?.isWhite === this.isWhiteTurnToPlay && this.secondBoard[i][j].isThreatenBy.length > 0) {
-                        //console.log(`Check on ${this.board[i][j].piece?.isWhite ? 'white' : 'black'} king (Second board)`, this.board[i][j], this.secondBoard[i][j])
-                        return true
+                        for (const pieceThreatening of this.secondBoard[i][j].isThreatenBy) {
+                            if (pieceThreatening.isWhite !== this.secondBoard[i][j].piece?.isWhite) {
+                                return true
+                            }
+                        }
                     }
                 }
             }
@@ -200,7 +208,7 @@ export default class Game {
         }
 
         let king: King = this.getKingOfColor(this.isWhiteTurnToPlay) as King
-        if (!king) throw new Error(`Could not find black king!`)
+        if (!king) throw new Error(`Could not find ${this.isWhiteTurnToPlay ? 'white' : 'black'} king!`)
 
         const rowToCheck = this.isWhiteTurnToPlay ? 7 : 0
         if (king && king.position.row === rowToCheck && king.position.column === 4) {
@@ -289,7 +297,6 @@ export default class Game {
 
         this.moveList.pop()
         this.calculateThreats()
-        this.calculateKingsMoves()
         this.isWhiteTurnToPlay = !this.isWhiteTurnToPlay
 
         /* 
@@ -321,6 +328,5 @@ export default class Game {
         this.moveList.push(previousMove + '=' + newPiece.getShortName()) // add promotion notation
 
         this.calculateThreats()
-        this.calculateKingsMoves()
     }
 }

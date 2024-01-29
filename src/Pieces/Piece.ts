@@ -28,18 +28,21 @@ export default class Piece {
     }
 
     addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(square: Square): boolean {
-        if (square.hasSquareAPieceOfDifferentColorOrIsEmpty(this)) {
-            this.possibleMoves.push(square.position)
-            square.isThreatenBy.push(this)
-        }
+        if (square.piece === null || square.piece.isWhite !== this.isWhite) this.possibleMoves.push(square.position)
+        square.isThreatenBy.push(this)
         return !(square.piece === null || (square.piece.type === 'King' && square.piece.isWhite !== this.isWhite)) // ignore enemy king to continue threats behind him
     }
 
-    checkBoundariesAndOppositeBoard(rowToCheck: number, columnToCheck: number, oppositeBoard: Square[][]): boolean {
+    checkBoundaries(rowToCheck: number, columnToCheck: number) {
         if (rowToCheck > -1 && rowToCheck < BOARD_ROWS && columnToCheck > -1 && columnToCheck < BOARD_COLUMNS) {
-            if (oppositeBoard[rowToCheck][columnToCheck].piece === null) {
-                return true
-            }
+            return true
+        }
+        return false
+    }
+
+    checkBoundariesAndOppositeBoard(rowToCheck: number, columnToCheck: number, oppositeBoard: Square[][]): boolean {
+        if (this.checkBoundaries(rowToCheck, columnToCheck) && oppositeBoard[rowToCheck][columnToCheck].piece === null) {
+            return true
         }
         return false
     }
