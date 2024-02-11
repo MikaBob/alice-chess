@@ -1,6 +1,4 @@
 .piece {
     position: absolute;
-    width: var(--tile-width);
-    height: var(--tile-width);
     top: 0;
 }

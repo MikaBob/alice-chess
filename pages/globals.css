@@ -3,6 +3,7 @@
 @tailwind utilities;
 :root {
     --tile-width: 80px;
+    --tile-width-small: 60px;
 }
 
 * {

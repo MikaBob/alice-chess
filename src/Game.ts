@@ -44,7 +44,7 @@ export default class Game {
         this.moveList = []
     }
 
-    public initChessSet() {
+    initChessSet() {
         this.board[0][0].setPieceOnSquare(new Tower(false))
         this.board[0][7].setPieceOnSquare(new Tower(false))
 
@@ -81,7 +81,7 @@ export default class Game {
         this.addCastlingAsPossibleMoves()
     }
 
-    public verifyMove(pieceToMove: Piece, positionTo: Position): boolean {
+    verifyMove(pieceToMove: Piece, positionTo: Position): boolean {
         if (pieceToMove.isWhite === this.isWhiteTurnToPlay && isPositionInList(positionTo, pieceToMove.possibleMoves)) {
             let tmpGame: Game = this.cloneGame()
             const tmpPieceToMove: Piece = pieceToMove.isOnMainBoard
@@ -95,7 +95,7 @@ export default class Game {
         return false
     }
 
-    public executeMove(pieceToMove: Piece, positionTo: Position): void {
+    executeMove(pieceToMove: Piece, positionTo: Position): void {
         let boardName = 'M'
         let deltaOfHorizontalSquares = pieceToMove.position.column - positionTo.column
         let moveName =
@@ -131,8 +131,7 @@ export default class Game {
         this.isWhiteTurnToPlay = !this.isWhiteTurnToPlay
     }
 
-    public calculateThreats(): void {
-        console.log('calculateThreats')
+    calculateThreats(): void {
         // reset all threats
         for (let i = 0; i < BOARD_ROWS; i++) {
             for (let j = 0; j < BOARD_COLUMNS; j++) {
@@ -150,7 +149,7 @@ export default class Game {
         this.calculateKingsMoves()
     }
 
-    public isKingUnderThreat(): boolean {
+    isKingUnderThreat(): boolean {
         for (let i = 0; i < BOARD_ROWS; i++) {
             for (let j = 0; j < BOARD_COLUMNS; j++) {
                 if (this.board[i][j].piece !== null) {
@@ -177,7 +176,7 @@ export default class Game {
         return false
     }
 
-    public calculateKingsMoves(): void {
+    calculateKingsMoves(): void {
         this.getKingOfColor(this.isWhiteTurnToPlay)?.calculatePossibleMoves(this) // re-calculate after calculating threats to prevent showing kings move to threaten squares
         this.addCastlingAsPossibleMoves()
     }
@@ -250,7 +249,7 @@ export default class Game {
         if (smallCastlePossible) king.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(this.board[rowToCheck][6])
     }
 
-    public getKingOfColor(ofColorWhite: boolean): King | null {
+    getKingOfColor(ofColorWhite: boolean): King | null {
         for (let i = 0; i < BOARD_ROWS; i++) {
             for (let j = 0; j < BOARD_COLUMNS; j++) {
                 if (this.board[i][j].piece !== null) if (this.board[i][j].piece?.type === PIECE_TYPE_KING && this.board[i][j].piece?.isWhite === ofColorWhite) return this.board[i][j].piece
@@ -261,7 +260,7 @@ export default class Game {
         return null
     }
 
-    public cloneGame(): Game {
+    cloneGame(): Game {
         const clone: Game = new Game()
         for (let i = 0; i < BOARD_ROWS; i++) {
             for (let j = 0; j < BOARD_COLUMNS; j++) {
@@ -274,7 +273,7 @@ export default class Game {
         return clone
     }
 
-    public cancelLastMove(): void {
+    cancelLastMove(): void {
         if (this.moveList.length < 1) return
 
         const moveListInReverse: string[] = this.moveList.toReversed()
@@ -307,7 +306,7 @@ export default class Game {
         */
     }
 
-    public promotePawn(pawnToPromote: Pawn, pieceNameToPromoteTo: string): void {
+    promotePawn(pawnToPromote: Pawn, pieceNameToPromoteTo: string): void {
         let newPiece: Piece | null = getNewPieceFromName(pieceNameToPromoteTo, pawnToPromote.isWhite)
 
         if (newPiece === null) {
@@ -328,5 +327,19 @@ export default class Game {
         this.moveList.push(previousMove + '=' + newPiece.getShortName()) // add promotion notation
 
         this.calculateThreats()
+    }
+
+    isGameOver(): boolean {
+        let isPat = true
+        for (let i = 0; i < BOARD_ROWS; i++) {
+            for (let j = 0; j < BOARD_COLUMNS; j++) {
+                if (
+                    (this.board[i][j].piece !== null && this.board[i][j].piece?.isWhite === this.isWhiteTurnToPlay && this.board[i][j].piece?.possibleMoves.length > 0) ||
+                    (this.secondBoard[i][j].piece !== null && this.secondBoard[i][j].piece?.isWhite === this.isWhiteTurnToPlay && this.secondBoard[i][j].piece?.possibleMoves.length > 0)
+                )
+                    isPat = false
+            }
+        }
+        return isPat
     }
 }

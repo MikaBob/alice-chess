@@ -23,7 +23,6 @@ export default function TileComponent({ square, callBackExecuteMove }: TileProps
     const dispatch = useDispatch()
 
     function pieceDragStart(e: React.DragEvent<HTMLDivElement>) {
-        //console.log('pieceDragStart')
         if (e !== null && e.target instanceof HTMLElement) {
             const isPieceOnMainBoard: boolean | undefined = e.target.dataset.ismainboard === 'true'
             const targetCoordinates: string | undefined = e.target.dataset.coordinates
@@ -38,7 +37,6 @@ export default function TileComponent({ square, callBackExecuteMove }: TileProps
     }
 
     function pieceDropped(e: any) {
-        //console.log('piecedropped')
         const targetCoordinates: string = e.target.dataset.coordinates
 
         if (dragNDropState.piece !== null) {
@@ -52,7 +50,6 @@ export default function TileComponent({ square, callBackExecuteMove }: TileProps
     }
 
     function tileDragEnter(e: React.DragEvent<HTMLDivElement>) {
-        //console.log('tileDragEnter', dragNDropState)
         dispatch(
             setDragNDropState({
                 isDragging: true,
@@ -63,7 +60,6 @@ export default function TileComponent({ square, callBackExecuteMove }: TileProps
     }
 
     function tileDragLeave(e: React.DragEvent<HTMLDivElement>) {
-        //console.log('tileDragLeave')
         /*         if (e !== null && e.target instanceof HTMLElement) {
             const targetCoordinates: string | undefined = e.target.dataset.coordinates
             if (targetCoordinates !== undefined) {
@@ -90,7 +86,7 @@ export default function TileComponent({ square, callBackExecuteMove }: TileProps
         }
     }
     const isDraggedPieceAboveTile: boolean = dragNDropState.isDragging ? coordinates === dragNDropState.hoveredCoordinates : false
-    const isKingUnderThreat: boolean = (square.piece?.type === 'King' && square.isThreatenByColor(!square.piece?.isWhite))
+    const isKingUnderThreat: boolean = square.piece?.type === 'King' && square.isThreatenByColor(!square.piece?.isWhite)
 
     let cssClasses: string = styles.tile
     cssClasses += isOriginalTileOfDraggedPiece ? ' ' + styles.pieceOriginalTile : ''
@@ -101,7 +97,7 @@ export default function TileComponent({ square, callBackExecuteMove }: TileProps
     return (
         <td>
             <div id={'tile_' + coordinates} className={cssClasses} onDragEnter={tileDragEnter} onDragLeave={tileDragLeave} onDragOver={onDragOver} onDrop={pieceDropped}>
-                <div className={styles.tileBackground}>
+                <div className={styles.tileBackground + ' ' + (square.isOnMainBoard ? ' ' : styles.secondBoard)}>
                     <Image data-coordinates={coordinates} src={'/board/' + tileColor + '-tile.png'} alt={tileColor + ' tile'} width="100" height="100" />
                 </div>
                 {square.piece !== null && <PieceComponent piece={square.piece} onDragStart={pieceDragStart} />}
