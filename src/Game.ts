@@ -10,6 +10,7 @@ import Square from './Square'
 
 export const BOARD_ROWS = 8
 export const BOARD_COLUMNS = 8
+export const REGEX_PARSE_MOVE: RegExp = /^(?<board>M|S)(?<piece>K|N|Q|R|B)?(?<from>[a-h][1-8])(?<action>-|x)(?<to>[a-h][1-8])=?(?<promotion>N|Q|R|B)?$/
 
 export type RegexParseMoveResult = {
     board: string
@@ -81,7 +82,8 @@ export default class Game {
         this.addCastlingAsPossibleMoves()
     }
 
-    verifyMove(pieceToMove: Piece, positionTo: Position): boolean {
+    verifyMove(pieceToMove: Piece | null, positionTo: Position): boolean {
+        if (pieceToMove === null) return false
         if (pieceToMove.isWhite === this.isWhiteTurnToPlay && isPositionInList(positionTo, pieceToMove.possibleMoves)) {
             let tmpGame: Game = this.cloneGame()
             const tmpPieceToMove: Piece = pieceToMove.isOnMainBoard
@@ -101,7 +103,7 @@ export default class Game {
         let moveName =
             pieceToMove.getShortName() +
             fromPositionToCoordinates(pieceToMove.position).toLowerCase() +
-            (this.board[positionTo.row][positionTo.column].piece === null ? '-' : 'x') +
+            (this.board[positionTo.row][positionTo.column].piece !== null || this.secondBoard[positionTo.row][positionTo.column].piece !== null ? 'x' : '-') +
             fromPositionToCoordinates(positionTo).toLowerCase()
 
         if (pieceToMove.isOnMainBoard) {
@@ -270,6 +272,7 @@ export default class Game {
         }
 
         clone.isWhiteTurnToPlay = this.isWhiteTurnToPlay ? true : false
+        clone.moveList = [...this.moveList]
         return clone
     }
 
@@ -278,26 +281,25 @@ export default class Game {
 
         const moveListInReverse: string[] = this.moveList.toReversed()
         const lastMove: string = moveListInReverse.shift() as string
-
-        const regexParseMove: RegExp = /^(?<board>M|S)(?<piece>K|N|Q|R|B)?(?<from>[a-h][1-8])(?<action>-|x)(?<to>[a-h][1-8])=?(?<promotion>N|Q|R|B)?$/
-        const { board, piece, from, action, to, promotion } = regexParseMove.exec(lastMove)?.groups as RegexParseMoveResult
-
+        const { board, piece, from, action, to, promotion } = REGEX_PARSE_MOVE.exec(lastMove)?.groups as RegexParseMoveResult
         const lastMoveWasOnMainBoard = board === 'M'
         const initialPositionOfLastMove: Position = fromCoordinatesToPosition(from)
         const finalPositionOfLastMove: Position = fromCoordinatesToPosition(to)
 
+        const pieceThatWasEaten: Piece | null = this.getLastPieceOnSquare(this.board[finalPositionOfLastMove.row][finalPositionOfLastMove.column], this.isWhiteTurnToPlay)
         if (lastMoveWasOnMainBoard) {
             this.board[initialPositionOfLastMove.row][initialPositionOfLastMove.column].setPieceOnSquare(this.secondBoard[finalPositionOfLastMove.row][finalPositionOfLastMove.column].piece)
+            this.board[finalPositionOfLastMove.row][finalPositionOfLastMove.column].setPieceOnSquare(pieceThatWasEaten)
             this.secondBoard[finalPositionOfLastMove.row][finalPositionOfLastMove.column].setPieceOnSquare(null)
         } else {
             this.secondBoard[initialPositionOfLastMove.row][initialPositionOfLastMove.column].setPieceOnSquare(this.board[finalPositionOfLastMove.row][finalPositionOfLastMove.column].piece)
+            this.secondBoard[finalPositionOfLastMove.row][finalPositionOfLastMove.column].setPieceOnSquare(pieceThatWasEaten)
             this.board[finalPositionOfLastMove.row][finalPositionOfLastMove.column].setPieceOnSquare(null)
         }
 
         this.moveList.pop()
         this.calculateThreats()
         this.isWhiteTurnToPlay = !this.isWhiteTurnToPlay
-
         /* 
         @TODO
         take back
@@ -333,13 +335,28 @@ export default class Game {
         let isPat = true
         for (let i = 0; i < BOARD_ROWS; i++) {
             for (let j = 0; j < BOARD_COLUMNS; j++) {
+                let pieceOnMainBoard: Piece | null = this.board[i][j].piece
+                let pieceOnSecondBoard: Piece | null = this.secondBoard[i][j].piece
                 if (
-                    (this.board[i][j].piece !== null && this.board[i][j].piece?.isWhite === this.isWhiteTurnToPlay && this.board[i][j].piece?.possibleMoves.length > 0) ||
-                    (this.secondBoard[i][j].piece !== null && this.secondBoard[i][j].piece?.isWhite === this.isWhiteTurnToPlay && this.secondBoard[i][j].piece?.possibleMoves.length > 0)
+                    (pieceOnMainBoard !== null && pieceOnMainBoard.isWhite === this.isWhiteTurnToPlay && pieceOnMainBoard.possibleMoves.length > 0) ||
+                    (pieceOnSecondBoard !== null && pieceOnSecondBoard.isWhite === this.isWhiteTurnToPlay && pieceOnSecondBoard.possibleMoves.length > 0)
                 )
                     isPat = false
             }
         }
         return isPat
+    }
+
+    getLastPieceOnSquare(square: Square, isWhite: boolean): Piece | null {
+        const moveListInReverse: string[] = this.moveList.toReversed()
+        moveListInReverse.shift()
+        for (let i = 0; i < moveListInReverse.length; i++) {
+            const { board, piece, from, action, to, promotion } = REGEX_PARSE_MOVE.exec(moveListInReverse[i])?.groups as RegexParseMoveResult
+            const finalPositionOfMove: Position = fromCoordinatesToPosition(to)
+            if (square.position.row === finalPositionOfMove.row && square.position.column === finalPositionOfMove.column) {
+                return getNewPieceFromShortName(piece ?? '', isWhite)
+            }
+        }
+        return null
     }
 }

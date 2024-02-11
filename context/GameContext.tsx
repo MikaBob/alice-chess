@@ -3,7 +3,7 @@ import Game from '@/src/Game'
 
 type GameContextType = {
     game: Game
-    updateGame: () => void
+    updateGame: (oldGame: Game) => void
 }
 
 const game = new Game()
@@ -11,7 +11,7 @@ game.initChessSet()
 
 const gameContextDefaultValues: GameContextType = {
     game: game,
-    updateGame: () => {},
+    updateGame: (oldGame: Game) => {},
 }
 
 const GameContext = createContext<GameContextType>(gameContextDefaultValues)
@@ -27,8 +27,9 @@ type GameProviderProps = {
 export function GameProvider({ children }: GameProviderProps) {
     const [game, setGame] = useState<Game>(gameContextDefaultValues.game)
 
-    const updateGame = () => {
-        setGame(game)
+    const updateGame = (oldGame: Game) => {
+        const newGame = oldGame.cloneGame()
+        setGame(newGame)
     }
 
     return <GameContext.Provider value={{ game, updateGame }}> {children} </GameContext.Provider>

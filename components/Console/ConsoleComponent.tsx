@@ -4,11 +4,12 @@ import styles from './console.module.css'
 interface Console {}
 
 export default function ConsoleComponent({}: Console) {
-    const { game } = useGameContext()
+    const { game, updateGame } = useGameContext()
     const msg = game.isGameOver() ? 'Game Over' : (game.isWhiteTurnToPlay ? 'White' : 'Black') + "'s turn"
 
     function undoMove() {
-        console.log(game)
+        game.cancelLastMove()
+        updateGame(game)
     }
 
     return (
