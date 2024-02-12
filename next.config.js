@@ -1,6 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    //reactStrictMode: true,
-};
+    basePath: '/alice-chess',
+    images: {
+        loader: 'custom',
+        loaderFile: './src/img-loader.ts',
+    },
+    output: 'export',
+}
 
-module.exports = nextConfig;
+module.exports = nextConfig
