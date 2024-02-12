@@ -4,6 +4,10 @@ Alice chess is a chess variant invented in 1953 by V. R. Parton which employs tw
 
 https://en.wikipedia.org/wiki/Alice_chess
 
+# Want to play ?
+
+So far only local games available at the [GitHub page of the repo](https://mikabob.github.io/alice-chess/)
+
 # To do
 
 -   Local games
@@ -16,9 +20,15 @@ https://en.wikipedia.org/wiki/Alice_chess
     -   ~~Prevent forbidden moves~~
     -   ~~Historic of moves~~
     -   ~~Castling~~
-    -   Promoting
+    -   ~~Promoting~~
     -   Animate moves
-    -   Game over
+    -   ~~Game over~~
+    -   ~~Console~~
+    -   ~~Undo move~~
+    -   Detect checkmates
+-   Bug fix
+    -   Dragging empty tiles
+    -   Promoting then click undo
 -   Multiplayer
     -   Client
         -   Websocket
