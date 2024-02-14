@@ -47,6 +47,17 @@ export default class Piece {
         return false
     }
 
+    checkPossibleMove(rowToCheck: number, columnToCheck: number, game: Game): boolean {
+        const currentBoard: Square[][] = this.isOnMainBoard ? game.board : game.secondBoard
+        const oppositeBoard: Square[][] = this.isOnMainBoard ? game.secondBoard : game.board
+        if (this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard)) {
+            if (this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])) {
+                return true
+            }
+        }
+        return false
+    }
+
     createNewPieceOfSameType(): Piece {
         throw new Error(`Piece ${this.type} must extend function createNewPieceOfSameType()!`)
     }

@@ -14,20 +14,38 @@ export type Position = {
     column: number
 }
 
+/**
+ * @param position
+ * @returns position as coordinates. {row: 1, column: 4} => e7
+ */
 export const fromPositionToCoordinates = (position: Position): string => {
     return '' + COLUMN_NAME[position.column] + Math.abs(position.row - BOARD_ROWS)
 }
 
+/**
+ * @param coordinates
+ * @returns coordinates as a position. B4 => {row: 5, column: 1}
+ */
 export const fromCoordinatesToPosition = (coordinates: string): Position => {
     const letter: string = coordinates[0]
     const row: number = Math.abs(Number(coordinates[1]) - BOARD_ROWS)
     return { row: row, column: COLUMN_NAME.indexOf(letter.toUpperCase()) }
 }
 
+/**
+ * @param positionA
+ * @param positionB
+ * @returns true if both positions have the same rows and the same columns
+ */
 export const arePositionsIdentical = (positionA: Position, positionB: Position): boolean => {
     return positionA.row === positionB.row && positionA.column === positionB.column
 }
 
+/**
+ * @param positionToCheck
+ * @param listOfPositions
+ * @returns true if the given position has identical values as at leat one of the given list of positions
+ */
 export const isPositionInList = (positionToCheck: Position, listOfPositions: Position[]): boolean => {
     let isInList: boolean = false
     listOfPositions.map((possiblePosition: Position) => {
@@ -38,6 +56,11 @@ export const isPositionInList = (positionToCheck: Position, listOfPositions: Pos
     return isInList
 }
 
+/**
+ * @param pieceName
+ * @param isWhite
+ * @returns A new specialized piece based on the given name and color (true = white)
+ */
 export const getNewPieceFromName = (pieceName: string, isWhite: boolean): Piece | null => {
     switch (pieceName) {
         case PIECE_TYPE_PAWN:
@@ -57,6 +80,12 @@ export const getNewPieceFromName = (pieceName: string, isWhite: boolean): Piece 
     }
 }
 
+/**
+ * Same as getNewPieceFromName, but with short names from the move list
+ * @param pieceShortName
+ * @param isWhite
+ * @returns A new specialized piece based on the given short name and color (true = white)
+ */
 export const getNewPieceFromShortName = (pieceShortName: string, isWhite: boolean): Piece | null => {
     switch (pieceShortName) {
         case new Pawn(isWhite).getShortName():

@@ -6,7 +6,6 @@ import BoardComponent from '@/components/Board/BoardComponent'
 import Head from 'next/head'
 import ModalPromotionComponent, { ModalPromotionParametersType } from '@/components/ModalPromotion/ModalPromotionComponent'
 import Piece from '@/src/Pieces/Piece'
-import styles from './index.module.css'
 import ConsoleComponent from '@/components/Console/ConsoleComponent'
 
 interface HomeProps {}
@@ -47,7 +46,7 @@ export default function Home({}: HomeProps) {
                 <meta name="description" content="Online Alice chess" />
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
             </Head>
-            <main className={styles.main}>
+            <main className="flex flex-col items-center p-3 min-h-screen">
                 <h1 className="text-3xl font-bold underline">Alice chess: a chess variant</h1>
                 <div className="grid grid-cols-2 gap-4 mt-3">
                     <BoardComponent isMainBoard={true} callBackExecuteMove={callBackExecuteMove} />

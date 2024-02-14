@@ -8,8 +8,8 @@ import { Queen } from './Pieces/Queen'
 import Piece from './Pieces/Piece'
 import Square from './Square'
 
-export const BOARD_ROWS = 8
 export const BOARD_COLUMNS = 8
+export const BOARD_ROWS = 8
 export const REGEX_PARSE_MOVE: RegExp = /^(?<board>M|S)(?<piece>K|N|Q|R|B)?(?<from>[a-h][1-8])(?<action>-|x)(?<to>[a-h][1-8])=?(?<promotion>N|Q|R|B)?$/
 
 export type RegexParseMoveResult = {
@@ -31,6 +31,8 @@ export default class Game {
         this.board = []
         this.secondBoard = []
         let isWhiteTile = 0
+
+        // squares
         for (let i = 0; i < BOARD_ROWS; i++) {
             this.board[i] = []
             this.secondBoard[i] = []
@@ -41,11 +43,16 @@ export default class Game {
             }
             isWhiteTile++ // alternate at each rows
         }
+
         this.isWhiteTurnToPlay = true
         this.moveList = []
     }
 
+    /**
+     * Create and initialize pieces on the board
+     */
     initChessSet() {
+        // Black
         this.board[0][0].setPieceOnSquare(new Tower(false))
         this.board[0][7].setPieceOnSquare(new Tower(false))
 
@@ -62,7 +69,7 @@ export default class Game {
             this.board[PAWN_INITIAL_ROW_BLACK][i].setPieceOnSquare(new Pawn(false))
         }
 
-        // white
+        // White
         this.board[7][0].setPieceOnSquare(new Tower(true))
         this.board[7][7].setPieceOnSquare(new Tower(true))
 
@@ -78,10 +85,18 @@ export default class Game {
         for (let i = 0; i < BOARD_COLUMNS; i++) {
             this.board[PAWN_INITIAL_ROW_WHITE][i].setPieceOnSquare(new Pawn(true))
         }
+
         this.calculateThreats()
-        this.addCastlingAsPossibleMoves()
+        this.addCastlingAsPossibleMoves() // In case we change the set, we could castle at the 1st turn
     }
 
+    /**
+     * Verify ahead if a move is valid by executing it in a cloned game
+     *
+     * @param pieceToMove
+     * @param positionTo
+     * @returns true if the move is valid
+     */
     verifyMove(pieceToMove: Piece | null, positionTo: Position): boolean {
         if (pieceToMove === null) return false
         if (pieceToMove.isWhite === this.isWhiteTurnToPlay && isPositionInList(positionTo, pieceToMove.possibleMoves)) {
@@ -97,6 +112,14 @@ export default class Game {
         return false
     }
 
+    /**
+     * Move a piece without checking if it is in its possible moves.
+     * Will add the move in the move list (history)
+     * Change turns
+     *
+     * @param pieceToMove
+     * @param positionTo
+     */
     executeMove(pieceToMove: Piece, positionTo: Position): void {
         let boardName = 'M'
         let deltaOfHorizontalSquares = pieceToMove.position.column - positionTo.column
@@ -133,6 +156,10 @@ export default class Game {
         this.isWhiteTurnToPlay = !this.isWhiteTurnToPlay
     }
 
+    /**
+     * Calculate the threats on the board by re-calculating
+     * the possible move for every pieces remaining on the board
+     */
     calculateThreats(): void {
         // reset all threats
         for (let i = 0; i < BOARD_ROWS; i++) {
@@ -151,6 +178,9 @@ export default class Game {
         this.calculateKingsMoves()
     }
 
+    /**
+     * @returns true if there is a "check" (king under attack) on the current player
+     */
     isKingUnderThreat(): boolean {
         for (let i = 0; i < BOARD_ROWS; i++) {
             for (let j = 0; j < BOARD_COLUMNS; j++) {
@@ -178,11 +208,21 @@ export default class Game {
         return false
     }
 
+    /**
+     * Kings movement are the only one that can not move on a threatened square
+     */
     calculateKingsMoves(): void {
         this.getKingOfColor(this.isWhiteTurnToPlay)?.calculatePossibleMoves(this) // re-calculate after calculating threats to prevent showing kings move to threaten squares
         this.addCastlingAsPossibleMoves()
     }
 
+    /**
+     * Castling is a specific move that requires many conditions:
+     *
+     * - The king must not have moved once
+     * - The Tower must not have moved once
+     * - The final position of the king and the tower must not be under threat (both boards)
+     */
     private addCastlingAsPossibleMoves() {
         let bigCastlePossible = true
         let smallCastlePossible = true
@@ -221,10 +261,10 @@ export default class Game {
                 towerLeft.type === PIECE_TYPE_TOWER &&
                 towerLeft.isWhite === this.isWhiteTurnToPlay &&
                 this.board[rowToCheck][1].piece === null &&
-                !this.board[rowToCheck][2].isEmptyAndNotThreatenByColor(!this.isWhiteTurnToPlay) &&
-                !this.board[rowToCheck][3].isEmptyAndNotThreatenByColor(!this.isWhiteTurnToPlay) &&
-                !this.secondBoard[rowToCheck][2].isEmptyAndNotThreatenByColor(!this.isWhiteTurnToPlay) &&
-                !this.secondBoard[rowToCheck][3].isEmptyAndNotThreatenByColor(!this.isWhiteTurnToPlay)
+                this.board[rowToCheck][2].isEmptyAndNotThreatenByColor(!this.isWhiteTurnToPlay) &&
+                this.board[rowToCheck][3].isEmptyAndNotThreatenByColor(!this.isWhiteTurnToPlay) &&
+                this.secondBoard[rowToCheck][2].isEmptyAndNotThreatenByColor(!this.isWhiteTurnToPlay) &&
+                this.secondBoard[rowToCheck][3].isEmptyAndNotThreatenByColor(!this.isWhiteTurnToPlay)
             ) {
                 bigCastlePossible = true
             } else bigCastlePossible = false
@@ -235,10 +275,10 @@ export default class Game {
                 towerRight &&
                 towerRight.type === PIECE_TYPE_TOWER &&
                 towerRight.isWhite === this.isWhiteTurnToPlay &&
-                !this.board[rowToCheck][6].isEmptyAndNotThreatenByColor(!this.isWhiteTurnToPlay) &&
-                !this.board[rowToCheck][5].isEmptyAndNotThreatenByColor(!this.isWhiteTurnToPlay) &&
-                !this.secondBoard[rowToCheck][6].isEmptyAndNotThreatenByColor(!this.isWhiteTurnToPlay) &&
-                !this.secondBoard[rowToCheck][5].isEmptyAndNotThreatenByColor(!this.isWhiteTurnToPlay)
+                this.board[rowToCheck][6].isEmptyAndNotThreatenByColor(!this.isWhiteTurnToPlay) &&
+                this.board[rowToCheck][5].isEmptyAndNotThreatenByColor(!this.isWhiteTurnToPlay) &&
+                this.secondBoard[rowToCheck][6].isEmptyAndNotThreatenByColor(!this.isWhiteTurnToPlay) &&
+                this.secondBoard[rowToCheck][5].isEmptyAndNotThreatenByColor(!this.isWhiteTurnToPlay)
             ) {
                 smallCastlePossible = true
             } else smallCastlePossible = false
@@ -247,10 +287,18 @@ export default class Game {
             smallCastlePossible = false
         }
 
+        console.log(smallCastlePossible, bigCastlePossible)
+
         if (bigCastlePossible) king.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(this.board[rowToCheck][2])
         if (smallCastlePossible) king.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(this.board[rowToCheck][6])
     }
 
+    /**
+     * Retrieve the king of the desired color
+     *
+     * @param ofColorWhite true if the expected color is white
+     * @returns the king of expected color
+     */
     getKingOfColor(ofColorWhite: boolean): King | null {
         for (let i = 0; i < BOARD_ROWS; i++) {
             for (let j = 0; j < BOARD_COLUMNS; j++) {
@@ -262,6 +310,11 @@ export default class Game {
         return null
     }
 
+    /**
+     * Create a new Game object with the same values as "this"
+     *
+     * @returns the same game as a new object
+     */
     cloneGame(): Game {
         const clone: Game = new Game()
         for (let i = 0; i < BOARD_ROWS; i++) {
@@ -276,6 +329,12 @@ export default class Game {
         return clone
     }
 
+    /**
+     * Undo a move based on the move list
+     *
+     * A regex is used to parse the moves
+     * it might re-create an eaten piece or undo a promotion
+     */
     cancelLastMove(): void {
         if (this.moveList.length < 1) return
 
@@ -302,12 +361,17 @@ export default class Game {
         this.isWhiteTurnToPlay = !this.isWhiteTurnToPlay
         /* 
         @TODO
-        take back
-            eating
-            promoting
+            Undo castlings
+            Undo promotions
         */
     }
 
+    /**
+     * Replace a pawn with a new piece (Promotion)
+     *
+     * @param pawnToPromote
+     * @param pieceNameToPromoteTo
+     */
     promotePawn(pawnToPromote: Pawn, pieceNameToPromoteTo: string): void {
         let newPiece: Piece | null = getNewPieceFromName(pieceNameToPromoteTo, pawnToPromote.isWhite)
 
@@ -331,6 +395,11 @@ export default class Game {
         this.calculateThreats()
     }
 
+    /**
+     * Verify if there is no pat or checkmate
+     *
+     * @returns true if the game is over
+     */
     isGameOver(): boolean {
         let isPat = true
         for (let i = 0; i < BOARD_ROWS; i++) {
@@ -344,9 +413,22 @@ export default class Game {
                     isPat = false
             }
         }
+        /**
+         * @TODO
+         * checkmates
+         */
         return isPat
     }
 
+    /**
+     * Retrieve which piece of the given color
+     * has been lastly eaten on the given square
+     * by browsing the move list
+     *
+     * @param square
+     * @param isWhite
+     * @returns the last piece eaten on the square, or null
+     */
     getLastPieceOnSquare(square: Square, isWhite: boolean): Piece | null {
         const moveListInReverse: string[] = this.moveList.toReversed()
         moveListInReverse.shift()

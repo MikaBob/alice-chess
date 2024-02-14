@@ -7,8 +7,8 @@ import styles from './modalPromotion.module.css'
 
 export const MODAL_ROOT_ELEMENT_ID = 'modal-root'
 
-interface ModalPromotion {
-    onClose: (pieceSelected: string)=>void,
+interface ModalPromotionProps {
+    onClose: (pieceSelected: string) => void
     pawnToPromote: Pawn
 }
 
@@ -17,7 +17,7 @@ export type ModalPromotionParametersType = {
     pawnToPromote: Pawn | null
 }
 
-export default function ModalPromotionComponent({ onClose, pawnToPromote }: ModalPromotion) {
+export default function ModalPromotionComponent({ onClose, pawnToPromote }: ModalPromotionProps) {
     const handleCloseClick = (e: React.MouseEvent<HTMLElement>) => {
         e.preventDefault()
         onClose('')
@@ -28,35 +28,28 @@ export default function ModalPromotionComponent({ onClose, pawnToPromote }: Moda
         onClose(e.currentTarget.dataset.pieceselectedforpromotion ?? '')
     }
 
-    const modalContent: any  = (
-      <div className={styles.modalOverlay} >
-            <div className={styles.modalWrapper}>
-                <div className={styles.modal}>
-                    <div className={styles.modalHeader}>
-                        <h1>Promotion selection</h1>
-                        <a href="#" onClick={handleCloseClick}>
-                            x
-                        </a>
-                    </div>
-                    <div className={styles.modalBody}>
-                        {
-                            pawnToPromote.getPossiblePromotions().map((possiblePromotion: Piece, index: number) => {
-                                return (
-                                    <div key={index} className={styles.possiblePromotionRow} onClick={clickPossiblePromotion} data-pieceselectedforpromotion={possiblePromotion.type}>
-                                        <Image src={'/board/' + possiblePromotion.img} alt={possiblePromotion.type} width="100" height="100" />
-                                        <span>{possiblePromotion.type}</span>
-                                    </div>
-                                )
-                            })
-                        }
-                    </div>
+    const modalContent: any = (
+        <div className="absolute top-0 left-0 w-full h-full flex justify-center items-center">
+            <div className={styles.modalWrapper + ' rounded-md p-3 border-2'}>
+                <div className="flex text-2xl">
+                    <h1 className="m-auto">Promotion selection</h1>
+                    <a href="#" onClick={handleCloseClick}>
+                        x
+                    </a>
+                </div>
+                <div className="pt-2">
+                    {pawnToPromote.getPossiblePromotions().map((possiblePromotion: Piece, index: number) => {
+                        return (
+                            <div key={index} className={styles.possiblePromotionRow + ' flex pt-2 w-full'} onClick={clickPossiblePromotion} data-pieceselectedforpromotion={possiblePromotion.type}>
+                                <Image src={'/board/' + possiblePromotion.img} alt={possiblePromotion.type} width="100" height="100" />
+                                <span className="m-auto">{possiblePromotion.type}</span>
+                            </div>
+                        )
+                    })}
                 </div>
             </div>
         </div>
     )
 
-    return ReactDOM.createPortal(
-      modalContent,
-      document.getElementById(MODAL_ROOT_ELEMENT_ID) as HTMLElement
-    )
+    return ReactDOM.createPortal(modalContent, document.getElementById(MODAL_ROOT_ELEMENT_ID) as HTMLElement)
 }

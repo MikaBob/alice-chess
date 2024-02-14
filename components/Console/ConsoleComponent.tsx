@@ -1,9 +1,9 @@
 import { useGameContext } from '@/context/GameContext'
 import styles from './console.module.css'
 
-interface Console {}
+interface ConsoleProps {}
 
-export default function ConsoleComponent({}: Console) {
+export default function ConsoleComponent({}: ConsoleProps) {
     const { game, updateGame } = useGameContext()
     const msg = game.isGameOver() ? 'Game Over' : (game.isWhiteTurnToPlay ? 'White' : 'Black') + "'s turn"
 

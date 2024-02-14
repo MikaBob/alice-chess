@@ -1,6 +1,6 @@
+import { Position } from '../Utils'
 import Game from '../Game'
 import Piece from './Piece'
-import Square from '../Square'
 
 export const PIECE_TYPE_KNIGHT = 'Knight'
 
@@ -12,67 +12,20 @@ export class Knight extends Piece {
     calculatePossibleMoves(game: Game): void {
         this.possibleMoves = []
 
-        const currentBoard: Square[][] = this.isOnMainBoard ? game.board : game.secondBoard
-        const oppositeBoard: Square[][] = this.isOnMainBoard ? game.secondBoard : game.board
+        let positionsToCheck: Position[] = [
+            { row: this.position.row - 2, column: this.position.column + 1 }, // North-East - 1
+            { row: this.position.row - 1, column: this.position.column + 2 }, // North-East - 2
+            { row: this.position.row + 2, column: this.position.column + 1 }, // South-East - 1
+            { row: this.position.row + 1, column: this.position.column + 2 }, // South-East - 2
+            { row: this.position.row + 2, column: this.position.column - 1 }, // South-West - 1
+            { row: this.position.row + 1, column: this.position.column - 2 }, // South-West - 2
+            { row: this.position.row - 2, column: this.position.column - 1 }, // North-West - 1
+            { row: this.position.row - 1, column: this.position.column - 2 }, // North-West - 2
+        ]
 
-        let rowToCheck: number = this.position.row
-        let columnToCheck: number = this.position.column
-
-        // North-East - 1
-        rowToCheck = this.position.row - 2
-        columnToCheck = this.position.column + 1
-        if (this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard)) {
-            this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
-        }
-
-        // North-East -2
-        rowToCheck = this.position.row - 1
-        columnToCheck = this.position.column + 2
-        if (this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard)) {
-            this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
-        }
-
-        // South-East - 1
-        rowToCheck = this.position.row + 2
-        columnToCheck = this.position.column + 1
-        if (this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard)) {
-            this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
-        }
-
-        // South-East -2
-        rowToCheck = this.position.row + 1
-        columnToCheck = this.position.column + 2
-        if (this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard)) {
-            this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
-        }
-
-        // South-West - 1
-        rowToCheck = this.position.row + 2
-        columnToCheck = this.position.column - 1
-        if (this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard)) {
-            this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
-        }
-
-        // South-West -2
-        rowToCheck = this.position.row + 1
-        columnToCheck = this.position.column - 2
-        if (this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard)) {
-            this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
-        }
-
-        // North-West - 1
-        rowToCheck = this.position.row - 2
-        columnToCheck = this.position.column - 1
-        if (this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard)) {
-            this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
-        }
-
-        // North-West -2
-        rowToCheck = this.position.row - 1
-        columnToCheck = this.position.column - 2
-        if (this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard)) {
-            this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
-        }
+        positionsToCheck.forEach((positionToCheck: Position) => {
+            this.checkPossibleMove(positionToCheck.row, positionToCheck.column, game)
+        })
     }
 
     createNewPieceOfSameType(): Knight {

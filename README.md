@@ -11,7 +11,8 @@ So far only local games available at the [GitHub page of the repo](https://mikab
 # To do
 
 -   Local games
-    -   ~~display 1st boards with pieces~~
+
+    -   ~~Display 1st boards with pieces~~
     -   ~~Drag and drop pieces~~
     -   ~~Take pieces on drop~~
     -   ~~2nd board with change of board upon moves (alice moves)~~
@@ -26,9 +27,12 @@ So far only local games available at the [GitHub page of the repo](https://mikab
     -   ~~Console~~
     -   ~~Undo move~~
     -   Detect checkmates
+
 -   Bug fix
+
     -   Dragging empty tiles
     -   Promoting then click undo
+
 -   Multiplayer
     -   Client
         -   Websocket

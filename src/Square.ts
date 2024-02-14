@@ -16,7 +16,12 @@ export default class Square {
         this.isThreatenBy = []
     }
 
-    public setPieceOnSquare(piece: Piece | null) {
+    /**
+     * Clear the square or put a piece on it
+     * Will update the piece's position
+     * @param piece
+     */
+    setPieceOnSquare(piece: Piece | null) {
         this.piece = piece
         if (this.piece !== null) {
             this.piece.isOnMainBoard = this.isOnMainBoard
@@ -24,11 +29,20 @@ export default class Square {
         }
     }
 
-    public isThreatenByColor(colorTrueForWhiteAndFalseForBlack: boolean): boolean {
+    /**
+     * @param colorTrueForWhiteAndFalseForBlack
+     * @returns true if the square has at least one threats of the given color
+     */
+    isThreatenedByColor(colorTrueForWhiteAndFalseForBlack: boolean): boolean {
         return this.isThreatenBy.find((piece: Piece) => piece.isWhite === colorTrueForWhiteAndFalseForBlack) !== undefined
     }
 
-    public isEmptyAndNotThreatenByColor(colorTrueForWhiteAndFalseForBlack: boolean): boolean {
-        return this.piece === null && this.isThreatenBy.find((piece: Piece) => piece.isWhite === colorTrueForWhiteAndFalseForBlack) !== undefined
+    /**
+     *
+     * @param colorTrueForWhiteAndFalseForBlack
+     * @returns true if the square is empty and not under threat by the given color
+     */
+    isEmptyAndNotThreatenByColor(colorTrueForWhiteAndFalseForBlack: boolean): boolean {
+        return this.piece === null && !this.isThreatenedByColor(colorTrueForWhiteAndFalseForBlack)
     }
 }

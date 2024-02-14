@@ -20,8 +20,8 @@ export class King extends Piece {
                 if (rowToCheck === this.position.row && columnToCheck === this.position.column) continue
                 if (
                     this.checkBoundariesAndOppositeBoard(rowToCheck, columnToCheck, oppositeBoard) &&
-                    !currentBoard[rowToCheck][columnToCheck].isThreatenByColor(!this.isWhite) &&
-                    !oppositeBoard[rowToCheck][columnToCheck].isThreatenByColor(!this.isWhite)
+                    !currentBoard[rowToCheck][columnToCheck].isThreatenedByColor(!this.isWhite) &&
+                    !oppositeBoard[rowToCheck][columnToCheck].isThreatenedByColor(!this.isWhite)
                 ) {
                     this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][columnToCheck])
                 }

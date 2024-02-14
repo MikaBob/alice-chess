@@ -4,6 +4,7 @@
 :root {
     --tile-width: 80px;
     --tile-width-small: 60px;
+    --modal-width: 500px;
 }
 
 * {

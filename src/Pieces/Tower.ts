@@ -1,6 +1,5 @@
 import Game, { BOARD_COLUMNS, BOARD_ROWS } from '../Game'
 import Piece from './Piece'
-import Square from '../Square'
 
 export const PIECE_TYPE_TOWER = 'Tower'
 
@@ -12,43 +11,24 @@ export class Tower extends Piece {
     calculatePossibleMoves(game: Game): void {
         this.possibleMoves = []
 
-        const currentBoard: Square[][] = this.isOnMainBoard ? game.board : game.secondBoard
-        const oppositeBoard: Square[][] = this.isOnMainBoard ? game.secondBoard : game.board
-
         // North
         for (let rowToCheck = this.position.row - 1; rowToCheck > -1; rowToCheck--) {
-            if (this.checkBoundariesAndOppositeBoard(rowToCheck, this.position.column, oppositeBoard)) {
-                if (this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][this.position.column])) {
-                    rowToCheck = -1
-                }
-            }
-        }
-
-        // East
-        for (let columnToCheck = this.position.column + 1; columnToCheck < BOARD_COLUMNS; columnToCheck++) {
-            if (this.checkBoundariesAndOppositeBoard(this.position.row, columnToCheck, oppositeBoard)) {
-                if (this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[this.position.row][columnToCheck])) {
-                    columnToCheck = BOARD_COLUMNS
-                }
-            }
+            if (this.checkPossibleMove(rowToCheck, this.position.column, game)) rowToCheck = -1
         }
 
         // South
         for (let rowToCheck = this.position.row + 1; rowToCheck < BOARD_ROWS; rowToCheck++) {
-            if (this.checkBoundariesAndOppositeBoard(rowToCheck, this.position.column, oppositeBoard)) {
-                if (this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[rowToCheck][this.position.column])) {
-                    rowToCheck = BOARD_ROWS
-                }
-            }
+            if (this.checkPossibleMove(rowToCheck, this.position.column, game)) rowToCheck = BOARD_ROWS
+        }
+
+        // East
+        for (let columnToCheck = this.position.column + 1; columnToCheck < BOARD_COLUMNS; columnToCheck++) {
+            if (this.checkPossibleMove(this.position.row, columnToCheck, game)) columnToCheck = BOARD_COLUMNS
         }
 
         // West
         for (let columnToCheck = this.position.column - 1; columnToCheck > -1; columnToCheck--) {
-            if (this.checkBoundariesAndOppositeBoard(this.position.row, columnToCheck, oppositeBoard)) {
-                if (this.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(currentBoard[this.position.row][columnToCheck])) {
-                    columnToCheck = -1
-                }
-            }
+            if (this.checkPossibleMove(this.position.row, columnToCheck, game)) columnToCheck = -1
         }
     }
 
