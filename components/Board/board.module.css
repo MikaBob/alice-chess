@@ -1,4 +1,0 @@
-.board {
-    width: calc(var(--tile-width) * 8);
-    height: calc(var(--tile-width) * 8);
-}

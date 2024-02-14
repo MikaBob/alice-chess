@@ -113,9 +113,9 @@ export default function TileComponent({ square, callBackExecuteMove }: TileProps
     const tileImgPrefix: string = square.isWhite ? 'white' : 'black'
     return (
         <td>
-            <div id={'tile_' + coordinates} className={cssClasses} onDragEnter={tileDragEnter} onDragOver={onDragOver} onDrop={pieceDropped}>
-                <div className={styles.tileBackground + ' ' + (square.isOnMainBoard ? ' ' : styles.secondBoard)} onDragStart={preventDrag}>
-                    <Image data-coordinates={coordinates} src={'/board/' + tileImgPrefix + '-tile.png'} alt={tileImgPrefix + ' tile'} width="100" height="100" />
+            <div id={'tile_' + coordinates} className={'lg:border-2 border-stone-400 ' + cssClasses} onDragEnter={tileDragEnter} onDragOver={onDragOver} onDrop={pieceDropped}>
+                <div className={square.isOnMainBoard ? styles.mainBoard : styles.secondBoard} onDragStart={preventDrag}>
+                    <Image data-coordinates={coordinates} src={'/board/' + tileImgPrefix + '-tile.png'} alt={tileImgPrefix + ' tile'} width="80" height="80" />
                 </div>
                 {square.piece !== null && <PieceComponent piece={square.piece} onDragStart={pieceDragStart} preventDrag={preventDrag} />}
             </div>

@@ -340,12 +340,12 @@ export default class Game {
 
         const moveListInReverse: string[] = this.moveList.toReversed()
         const lastMove: string = moveListInReverse.shift() as string
-        const { board, piece, from, action, to, promotion } = REGEX_PARSE_MOVE.exec(lastMove)?.groups as RegexParseMoveResult
+        const { board, from, to } = REGEX_PARSE_MOVE.exec(lastMove)?.groups as RegexParseMoveResult
         const lastMoveWasOnMainBoard = board === 'M'
         const initialPositionOfLastMove: Position = fromCoordinatesToPosition(from)
         const finalPositionOfLastMove: Position = fromCoordinatesToPosition(to)
 
-        const pieceThatWasEaten: Piece | null = this.getLastPieceOnSquare(this.board[finalPositionOfLastMove.row][finalPositionOfLastMove.column], this.isWhiteTurnToPlay)
+        const pieceThatWasEaten: Piece | null = this.getLastPieceEatenOnSquare(this.board[finalPositionOfLastMove.row][finalPositionOfLastMove.column], this.isWhiteTurnToPlay)
         if (lastMoveWasOnMainBoard) {
             this.board[initialPositionOfLastMove.row][initialPositionOfLastMove.column].setPieceOnSquare(this.secondBoard[finalPositionOfLastMove.row][finalPositionOfLastMove.column].piece)
             this.board[finalPositionOfLastMove.row][finalPositionOfLastMove.column].setPieceOnSquare(pieceThatWasEaten)
@@ -429,11 +429,11 @@ export default class Game {
      * @param isWhite
      * @returns the last piece eaten on the square, or null
      */
-    getLastPieceOnSquare(square: Square, isWhite: boolean): Piece | null {
+    getLastPieceEatenOnSquare(square: Square, isWhite: boolean): Piece | null {
         const moveListInReverse: string[] = this.moveList.toReversed()
         moveListInReverse.shift()
         for (let i = 0; i < moveListInReverse.length; i++) {
-            const { board, piece, from, action, to, promotion } = REGEX_PARSE_MOVE.exec(moveListInReverse[i])?.groups as RegexParseMoveResult
+            const { piece, to } = REGEX_PARSE_MOVE.exec(moveListInReverse[i])?.groups as RegexParseMoveResult
             const finalPositionOfMove: Position = fromCoordinatesToPosition(to)
             if (square.position.row === finalPositionOfMove.row && square.position.column === finalPositionOfMove.column) {
                 return getNewPieceFromShortName(piece ?? '', isWhite)

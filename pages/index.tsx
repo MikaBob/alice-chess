@@ -7,6 +7,7 @@ import Head from 'next/head'
 import ModalPromotionComponent, { ModalPromotionParametersType } from '@/components/ModalPromotion/ModalPromotionComponent'
 import Piece from '@/src/Pieces/Piece'
 import ConsoleComponent from '@/components/Console/ConsoleComponent'
+import MoveListComponent from '@/components/MoveList/MoveListComponent'
 
 interface HomeProps {}
 
@@ -46,13 +47,16 @@ export default function Home({}: HomeProps) {
                 <meta name="description" content="Online Alice chess" />
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
             </Head>
-            <main className="flex flex-col items-center p-3 min-h-screen">
-                <h1 className="text-3xl font-bold underline">Alice chess: a chess variant</h1>
-                <div className="grid grid-cols-2 gap-4 mt-3">
+            <main className=" min-h-screen max-w-screen-xs sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl 2xl:max-w-screen-2xl m-auto p-3">
+                <h1 className="text-md md:text-3xl font-bold underline text-center">Alice chess: a chess variant</h1>
+                <div className="flex flex-row mt-3 p-1 items-center">
                     <BoardComponent isMainBoard={true} callBackExecuteMove={callBackExecuteMove} />
                     <BoardComponent callBackExecuteMove={callBackExecuteMove} />
                 </div>
-                <div className="w-full m-3">{<ConsoleComponent />}</div>
+                <div className="flex flex-row mt-3 p-1 ">
+                    <MoveListComponent />
+                    <ConsoleComponent />
+                </div>
                 {modalPromotionParameters.isVisible && <ModalPromotionComponent onClose={modalPromotionClosed} pawnToPromote={modalPromotionParameters.pawnToPromote as Pawn} />}
             </main>
         </>

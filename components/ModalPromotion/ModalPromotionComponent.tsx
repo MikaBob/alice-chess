@@ -32,7 +32,7 @@ export default function ModalPromotionComponent({ onClose, pawnToPromote }: Moda
         <div className="absolute top-0 left-0 w-full h-full flex justify-center items-center">
             <div className={styles.modalWrapper + ' rounded-md p-3 border-2'}>
                 <div className="flex text-2xl">
-                    <h1 className="m-auto">Promotion selection</h1>
+                    <h1 className="m-auto font-bold text-sm md:text-2xl">Promotion selection</h1>
                     <a href="#" onClick={handleCloseClick}>
                         x
                     </a>
@@ -40,9 +40,14 @@ export default function ModalPromotionComponent({ onClose, pawnToPromote }: Moda
                 <div className="pt-2">
                     {pawnToPromote.getPossiblePromotions().map((possiblePromotion: Piece, index: number) => {
                         return (
-                            <div key={index} className={styles.possiblePromotionRow + ' flex pt-2 w-full'} onClick={clickPossiblePromotion} data-pieceselectedforpromotion={possiblePromotion.type}>
+                            <div
+                                key={index}
+                                className={styles.possiblePromotionRow + ' flex pt-2 w-full max-w-16 lg:md:max-w-52'}
+                                onClick={clickPossiblePromotion}
+                                data-pieceselectedforpromotion={possiblePromotion.type}
+                            >
                                 <Image src={'/board/' + possiblePromotion.img} alt={possiblePromotion.type} width="100" height="100" />
-                                <span className="m-auto">{possiblePromotion.type}</span>
+                                <span className="m-auto text-sm md:text-2lg">{possiblePromotion.type}</span>
                             </div>
                         )
                     })}

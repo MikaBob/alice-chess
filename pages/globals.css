@@ -1,21 +1,55 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 :root {
-    --tile-width: 80px;
-    --tile-width-small: 60px;
-    --modal-width: 500px;
+    --tile-width: 25px;
+    --tile-width-small: 10px;
+    --modal-width: 200px;
+}
+
+@media (width >= 470px) {
+    :root {
+        --tile-width: 30px;
+        --tile-width-small: 22px;
+        --modal-width: 300px;
+    }
+}
+
+@media (width >= 640px) {
+    :root {
+        --tile-width: 40px;
+        --tile-width-small: 32px;
+    }
+}
+
+@media (width >= 768px) {
+    :root {
+        --tile-width: 48px;
+        --tile-width-small: 34px;
+    }
+}
+
+@media (width >= 992px) {
+    :root {
+        --tile-width: 58px;
+        --tile-width-small: 50px;
+        --modal-width: 500px;
+    }
+}
+
+@media (width >= 1200px) {
+    :root {
+        --tile-width: 75px;
+        --tile-width-small: 55px;
+    }
 }
 
 * {
-    box-sizing: border-box;
     padding: 0;
     margin: 0;
 }
 
-html,
 body {
-    width: calc(var(--tile-width) * 20);
-    overflow: hidden;
     background: linear-gradient(to bottom, transparent, rgb(255, 255, 255)) rgb(214, 219, 220);
 }

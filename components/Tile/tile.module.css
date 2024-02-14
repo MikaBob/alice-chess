@@ -1,6 +1,6 @@
-.tileBackground {
-    width: var(--tile-width);
-    height: var(--tile-width);
+.mainBoard {
+    width: calc(var(--tile-width));
+    height: calc(var(--tile-width));
 }
 
 .secondBoard {

@@ -1,0 +1,11 @@
+.consoleContainer {
+    background-color: aliceblue;
+}
+
+.consoleButton {
+    background-color: bisque;
+}
+
+.consoleButton:hover {
+    background-color: burlywood;
+}
