@@ -1,6 +1,8 @@
 # Alice chess
 
-Alice chess is a chess variant invented in 1953 by V. R. Parton which employs two chessboards rather than one. Rules are the same as standard chess, with the particularity that at the completion of a move, transferring to the corresponding square on the opposite board.
+Alice chess is a chess variant invented in 1953 by V. R. Parton which employs two chessboards rather than one.
+
+Rules are the same as standard chess, with the particularity that at the completion of a move, transferring to the corresponding square on the opposite board.
 
 1. A move must be legal on the board where it is played.
 
@@ -9,6 +11,7 @@ Alice chess is a chess variant invented in 1953 by V. R. Parton which employs tw
 3. After moving, the piece is transfered to the corresponding square on the other board.
 
 Wiki https://en.wikipedia.org/wiki/Alice_chess
+
 Better rule explanation https://www.chessvariants.com/other.dir/alice.html
 
 # Want to play ?

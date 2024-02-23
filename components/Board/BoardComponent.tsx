@@ -2,6 +2,7 @@ import { callBackExecuteMoveType } from '@/pages'
 import { useGameContext } from '@/context/GameContext'
 import Square from '@/src/Square'
 import TileComponent from '../Tile/TileComponent'
+import { COLUMN_NAME } from '@/src/Utils'
 
 interface BoardProps {
     isMainBoard?: boolean
@@ -21,9 +22,21 @@ export default function BoardComponent({ isMainBoard, callBackExecuteMove }: Boa
                                 {squares.map((square: Square, index2: number) => {
                                     return <TileComponent key={index2} square={square} callBackExecuteMove={callBackExecuteMove} />
                                 })}
+                                <td key={index} className="border-2 border-black text-center px-2">
+                                    {8 - index}
+                                </td>
                             </tr>
                         )
                     })}
+                    <tr>
+                        {COLUMN_NAME.map((columnLetter: string, index: number) => {
+                            return (
+                                <td key={index} className="border-2 border-black text-center">
+                                    {columnLetter}
+                                </td>
+                            )
+                        })}
+                    </tr>
                 </tbody>
             </table>
         </div>

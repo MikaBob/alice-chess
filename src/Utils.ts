@@ -7,7 +7,7 @@ import { PIECE_TYPE_QUEEN, Queen } from './Pieces/Queen'
 import { PIECE_TYPE_TOWER, Tower } from './Pieces/Tower'
 import Piece from './Pieces/Piece'
 
-export const COLUMN_NAME = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M']
+export const COLUMN_NAME = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
 
 export type Position = {
     row: number
