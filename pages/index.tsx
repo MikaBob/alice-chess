@@ -3,11 +3,12 @@ import { Position } from '@/src/Utils'
 import { useGameContext } from '@/context/GameContext'
 import { useState } from 'react'
 import BoardComponent from '@/components/Board/BoardComponent'
-import Head from 'next/head'
-import ModalPromotionComponent, { ModalPromotionParametersType } from '@/components/ModalPromotion/ModalPromotionComponent'
-import Piece from '@/src/Pieces/Piece'
 import ConsoleComponent from '@/components/Console/ConsoleComponent'
+import Head from 'next/head'
+import IntroductionComponent from '@/components/Introduction/IntroductionComponent'
+import ModalPromotionComponent, { ModalPromotionParametersType } from '@/components/ModalPromotion/ModalPromotionComponent'
 import MoveListComponent from '@/components/MoveList/MoveListComponent'
+import Piece from '@/src/Pieces/Piece'
 
 interface HomeProps {}
 
@@ -49,11 +50,12 @@ export default function Home({}: HomeProps) {
             </Head>
             <main className=" min-h-screen max-w-screen-xs sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl 2xl:max-w-screen-2xl m-auto p-3">
                 <h1 className="text-md md:text-3xl font-bold underline text-center">Alice chess: a chess variant</h1>
+                <IntroductionComponent />
                 <div className="flex flex-row mt-3 p-1 items-center">
                     <BoardComponent isMainBoard={true} callBackExecuteMove={callBackExecuteMove} />
                     <BoardComponent callBackExecuteMove={callBackExecuteMove} />
                 </div>
-                <div className="flex flex-row mt-3 p-1 ">
+                <div className="flex flex-row mt-3 p-1 items-center">
                     <MoveListComponent />
                     <ConsoleComponent />
                 </div>
