@@ -21,7 +21,7 @@ export default function ConsoleComponent({}: ConsoleProps) {
     }
 
     return (
-        <div className="basis-1/2 ml-auto">
+        <div className="secondPart">
             <h2 className="text-sm md:text-2xl font-bold underline mb-2">Console</h2>
             <div>
                 <div>

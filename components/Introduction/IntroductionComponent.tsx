@@ -4,8 +4,8 @@ interface IntroductionProps {}
 
 export default function IntroductionComponent({}: IntroductionProps) {
     return (
-        <div className="flex flex-row mt-3 p-1 items-center mt-2 ">
-            <div className="basis-2/3">
+        <div className="partDivider mt-2 ">
+            <div className="firstPart">
                 <h2 className="text-sm md:text-2xl font-bold underline mb-2">Rules</h2>
                 <p>
                     Same as normal chess, except after a move the piece will pass to the 2nd board.
@@ -19,7 +19,7 @@ export default function IntroductionComponent({}: IntroductionProps) {
                     </Link>
                 </p>
             </div>
-            <div className="basis-1/2  ml-auto">
+            <div className="secondPart">
                 <h2 className="text-sm md:text-2xl font-bold underline mb-2">Gameplay</h2>
                 <p>
                     When dragging a piece, green tiles are the possible moves.

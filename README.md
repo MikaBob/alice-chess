@@ -45,8 +45,6 @@ The game is shared accross all components by using "context". The Drag and Drop 
     -   Bug to fix
         -   Undo allow to eat own pieces
         -   Undo castling & promotion
-        -   Scroll historic
-        -   We can select images
         -   Fix react warning
     -   Refactoring
         -   Interfaces for Pieces

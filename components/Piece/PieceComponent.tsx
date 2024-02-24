@@ -18,7 +18,15 @@ export default function PieceComponent({ piece, onDragStart, preventDrag }: Piec
     // if it is your turn, activate drag&drop (onDragStart | OnMouseDown)
     return (
         <div id={'piece_' + coordinates} draggable={isYourTurn} onDragStart={isYourTurn ? onDragStart : preventDrag} className="absolute top-0">
-            <Image data-coordinates={coordinates} data-ismainboard={piece.isOnMainBoard} src={'/board/' + piece.img} alt={piece.type} width="100" height="100" />
+            <Image
+                className={isYourTurn ? '' : 'preventSelect'}
+                data-coordinates={coordinates}
+                data-ismainboard={piece.isOnMainBoard}
+                src={'/board/' + piece.img}
+                alt={piece.type}
+                width="100"
+                height="100"
+            />
         </div>
     )
 }
