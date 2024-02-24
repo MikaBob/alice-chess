@@ -21,7 +21,7 @@ export default class Square {
      * Will update the piece's position
      * @param piece
      */
-    setPieceOnSquare(piece: Piece | null) {
+    setPieceOnSquare(piece: Piece | null): void {
         this.piece = piece
         if (this.piece !== null) {
             this.piece.isOnMainBoard = this.isOnMainBoard

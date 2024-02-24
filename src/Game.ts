@@ -8,17 +8,22 @@ import { Queen } from './Pieces/Queen'
 import Piece from './Pieces/Piece'
 import Square from './Square'
 
+const MAIN_BOARD_SHORT_NAME = 'M'
+const SECOND_BOARD_SHORT_NAME = 'S'
+const BIG_CASTLING_SHORT_NAME = 'O-O-O'
+const SMALL_CASTLING_SHORT_NAME = 'O-O'
+
 export const BOARD_COLUMNS = 8
 export const BOARD_ROWS = 8
 export const REGEX_PARSE_MOVE: RegExp = /^(?<board>M|S)(?<piece>K|N|Q|R|B)?(?<from>[a-h][1-8])(?<action>-|x)(?<to>[a-h][1-8])=?(?<promotion>N|Q|R|B)?$/
 
 export type RegexParseMoveResult = {
     board: string
-    piece: string | null
+    piece: string | undefined
     from: string
     action: string
     to: string
-    promotion: string | null
+    promotion: string | undefined
 }
 
 export default class Game {
@@ -51,7 +56,7 @@ export default class Game {
     /**
      * Create and initialize pieces on the board
      */
-    initChessSet() {
+    initChessSet(): void {
         // Black
         this.board[0][0].setPieceOnSquare(new Tower(false))
         this.board[0][7].setPieceOnSquare(new Tower(false))
@@ -121,14 +126,13 @@ export default class Game {
      * @param positionTo
      */
     executeMove(pieceToMove: Piece, positionTo: Position): void {
-        let boardName = 'M'
-        let deltaOfHorizontalSquares = pieceToMove.position.column - positionTo.column
+        let boardName = MAIN_BOARD_SHORT_NAME
         let moveName =
             pieceToMove.getShortName() +
             fromPositionToCoordinates(pieceToMove.position).toLowerCase() +
             (this.board[positionTo.row][positionTo.column].piece !== null || this.secondBoard[positionTo.row][positionTo.column].piece !== null ? 'x' : '-') +
             fromPositionToCoordinates(positionTo).toLowerCase()
-
+        const initialPiecePostion: Position = pieceToMove.position
         if (pieceToMove.isOnMainBoard) {
             this.board[pieceToMove.position.row][pieceToMove.position.column].setPieceOnSquare(null) // empty square where it currently stands
             this.board[positionTo.row][positionTo.column].setPieceOnSquare(null) // empty square  where it will go
@@ -137,21 +141,21 @@ export default class Game {
             this.secondBoard[pieceToMove.position.row][pieceToMove.position.column].setPieceOnSquare(null) // empty square where it currently stands
             this.secondBoard[positionTo.row][positionTo.column].setPieceOnSquare(null) // empty square where it will go
             this.board[positionTo.row][positionTo.column].setPieceOnSquare(pieceToMove) // move piece on the other board
-            boardName = 'S'
+            boardName = SECOND_BOARD_SHORT_NAME
         }
 
         // for castling, move also the tower
         if (pieceToMove.type === PIECE_TYPE_KING) {
+            let deltaOfHorizontalSquares = initialPiecePostion.column - positionTo.column
             // a king moving by 2 squares can only be castling
             if (Math.abs(deltaOfHorizontalSquares) > 1) {
-                let isBigCastle: boolean = deltaOfHorizontalSquares > 0 // positif = left of the king = big castling
+                let isBigCastle: boolean = deltaOfHorizontalSquares > 0 // positif = left of the king => big castling
                 let tower: Tower = this.board[pieceToMove.position.row][isBigCastle ? 0 : 7].piece as Tower
                 this.board[tower.position.row][tower.position.column].setPieceOnSquare(null) // empty square where tower currently stands
                 this.secondBoard[tower.position.row][isBigCastle ? 3 : 5].setPieceOnSquare(tower) // move piece on the other board
-                moveName = isBigCastle ? 'O-O-O' : 'O-O'
+                moveName = isBigCastle ? BIG_CASTLING_SHORT_NAME : SMALL_CASTLING_SHORT_NAME
             }
         }
-
         this.moveList.push(boardName + moveName) // write history
         this.isWhiteTurnToPlay = !this.isWhiteTurnToPlay
     }
@@ -223,7 +227,7 @@ export default class Game {
      * - The Tower must not have moved once
      * - The final position of the king and the tower must not be under threat (both boards)
      */
-    private addCastlingAsPossibleMoves() {
+    addCastlingAsPossibleMoves(): void {
         let bigCastlePossible = true
         let smallCastlePossible = true
 
@@ -287,8 +291,6 @@ export default class Game {
             smallCastlePossible = false
         }
 
-        console.log(smallCastlePossible, bigCastlePossible)
-
         if (bigCastlePossible) king.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(this.board[rowToCheck][2])
         if (smallCastlePossible) king.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(this.board[rowToCheck][6])
     }
@@ -341,7 +343,7 @@ export default class Game {
         const moveListInReverse: string[] = this.moveList.toReversed()
         const lastMove: string = moveListInReverse.shift() as string
         const { board, from, to } = REGEX_PARSE_MOVE.exec(lastMove)?.groups as RegexParseMoveResult
-        const lastMoveWasOnMainBoard = board === 'M'
+        const lastMoveWasOnMainBoard = board === MAIN_BOARD_SHORT_NAME
         const initialPositionOfLastMove: Position = fromCoordinatesToPosition(from)
         const finalPositionOfLastMove: Position = fromCoordinatesToPosition(to)
 
@@ -372,12 +374,12 @@ export default class Game {
      * @param pawnToPromote
      * @param pieceNameToPromoteTo
      */
-    promotePawn(pawnToPromote: Pawn, pieceNameToPromoteTo: string): void {
+    promotePawn(pawnToPromote: Pawn, pieceNameToPromoteTo: string): boolean {
         let newPiece: Piece | null = getNewPieceFromName(pieceNameToPromoteTo, pawnToPromote.isWhite)
 
         if (newPiece === null) {
             this.cancelLastMove()
-            return
+            return false
         }
 
         newPiece.position = pawnToPromote.position
@@ -392,7 +394,7 @@ export default class Game {
         const previousMove: string = this.moveList.pop() as string // remove pawn's move from the list
         this.moveList.push(previousMove + '=' + newPiece.getShortName()) // add promotion notation
 
-        this.calculateThreats()
+        return true
     }
 
     /**
@@ -440,5 +442,42 @@ export default class Game {
             }
         }
         return null
+    }
+
+    /**
+     * Load a game by executing a list of moves
+     *
+     * @param moveList
+     */
+    loadMoveList(moveList: string[]): void {
+        moveList.forEach((move: string) => {
+            // Dealing with caslting
+            if (move === MAIN_BOARD_SHORT_NAME + BIG_CASTLING_SHORT_NAME || move === MAIN_BOARD_SHORT_NAME + SMALL_CASTLING_SHORT_NAME) {
+                const kingToMove: King | null = this.getKingOfColor(this.isWhiteTurnToPlay)
+                if (!kingToMove) throw new Error(`Invalid move "${move}". Can not load game!`)
+                const newKingPositon: Position = { row: kingToMove.position.row, column: kingToMove.position.column + (move === MAIN_BOARD_SHORT_NAME + BIG_CASTLING_SHORT_NAME ? -2 : 2) }
+                this.executeMove(kingToMove, newKingPositon)
+                return
+            }
+
+            // Dealing with normal moves
+            const { board, piece, from, to, promotion } = REGEX_PARSE_MOVE.exec(move)?.groups as RegexParseMoveResult
+            const initialPosition: Position = fromCoordinatesToPosition(from)
+            const finalPosition: Position = fromCoordinatesToPosition(to)
+
+            const pieceToMove: Piece | null =
+                board === MAIN_BOARD_SHORT_NAME ? this.board[initialPosition.row][initialPosition.column].piece : this.secondBoard[initialPosition.row][initialPosition.column].piece
+            if (!pieceToMove) throw new Error(`Invalid move "${move}", there is no "${getNewPieceFromShortName(piece ?? '', false)?.type}". Can not load game!`)
+
+            this.executeMove(pieceToMove, finalPosition)
+
+            // Dealing with promotions
+            if (promotion !== undefined && promotion !== null) {
+                pieceToMove.position = finalPosition
+                const tmpPiece: Piece | null = getNewPieceFromShortName(promotion, pieceToMove.isWhite)
+                if (!this.promotePawn(pieceToMove as Pawn, tmpPiece?.type ?? 'Piece Not Found')) throw new Error(`Invalid move "${move}", promotion invalid. Can not load game!`)
+            }
+        })
+        this.calculateThreats()
     }
 }

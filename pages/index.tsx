@@ -1,7 +1,7 @@
 import { PIECE_TYPE_PAWN, Pawn } from '@/src/Pieces/Pawn'
-import { Position } from '@/src/Utils'
+import { Position, loadMoveListFromLS, saveMoveListInLS } from '@/src/Utils'
 import { useGameContext } from '@/context/GameContext'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import BoardComponent from '@/components/Board/BoardComponent'
 import ConsoleComponent from '@/components/Console/ConsoleComponent'
 import Head from 'next/head'
@@ -15,7 +15,13 @@ interface HomeProps {}
 export type callBackExecuteMoveType = (pieceToMove: Piece, newPosition: Position) => void
 
 export default function Home({}: HomeProps) {
-    const { game } = useGameContext()
+    const { game, updateGame } = useGameContext()
+
+    useEffect(() => {
+        loadMoveListFromLS(game)
+        updateGame(game)
+    }, [])
+
     const [modalPromotionParameters, setModalPromotionParameters] = useState({
         isVisible: false,
         pawnToPromote: null,
@@ -30,14 +36,15 @@ export default function Home({}: HomeProps) {
             }
             game.executeMove(pieceToMove, newPosition)
             game.calculateThreats()
+            saveMoveListInLS(game.moveList)
         }
-        //console.log(game)
     }
 
     //console.log(game)
 
     const modalPromotionClosed = (pieceSelected: string) => {
         game.promotePawn(modalPromotionParameters.pawnToPromote as Pawn, pieceSelected)
+        game.calculateThreats()
         setModalPromotionParameters({ isVisible: false, pawnToPromote: null })
     }
 

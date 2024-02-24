@@ -1,4 +1,4 @@
-import { BOARD_ROWS } from './Game'
+import Game, { BOARD_ROWS, REGEX_PARSE_MOVE, RegexParseMoveResult } from './Game'
 import { PIECE_TYPE_BISHOP, Bishop } from './Pieces/Bishop'
 import { PIECE_TYPE_KING, King } from './Pieces/King'
 import { PIECE_TYPE_KNIGHT, Knight } from './Pieces/Knight'
@@ -8,6 +8,8 @@ import { PIECE_TYPE_TOWER, Tower } from './Pieces/Tower'
 import Piece from './Pieces/Piece'
 
 export const COLUMN_NAME = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+
+const MOVE_LIST_IN_LS = 'moves'
 
 export type Position = {
     row: number
@@ -103,4 +105,32 @@ export const getNewPieceFromShortName = (pieceShortName: string, isWhite: boolea
         default:
             return null
     }
+}
+
+/**
+ * Save a game in Local Storage
+ *
+ * @param moveList
+ */
+export const saveMoveListInLS = (moves: string[]) => {
+    if (moves.length === 0) {
+        localStorage.removeItem(MOVE_LIST_IN_LS)
+        return
+    }
+
+    const csvMoves: string = moves.reduce((acc: string, val: string) => {
+        return acc + ',' + val
+    })
+    localStorage.setItem(MOVE_LIST_IN_LS, btoa(csvMoves))
+}
+
+/**
+ * Load move list from Local Storage into a game
+ *
+ * @param gameToloadListInto
+ */
+export const loadMoveListFromLS = (gameToloadListInto: Game): void => {
+    const movesFromLS: string | null = localStorage.getItem(MOVE_LIST_IN_LS)
+    if (!movesFromLS) return
+    gameToloadListInto.loadMoveList(atob(movesFromLS).split(','))
 }

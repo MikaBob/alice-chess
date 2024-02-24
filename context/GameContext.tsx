@@ -1,5 +1,6 @@
 import { ReactNode, createContext, useContext, useState } from 'react'
 import Game from '@/src/Game'
+import { loadMoveListFromLS } from '@/src/Utils'
 
 type GameContextType = {
     game: Game
