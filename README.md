@@ -38,17 +38,10 @@ The game is shared accross all components by using "context". The Drag and Drop 
 
     -   Detect checkmates
     -   Animate moves
-    -   Undo Promotion & Castling
     -   Turn boards upside down
-    -   En passant
-    -   See other board's tile content in transparency
-    -   Bug to fix
-        -   Undo allow to eat own pieces
-        -   Undo castling & promotion
-        -   Fix react warning
+    -   En passant & Undo en passant
     -   Refactoring
         -   Interfaces for Pieces
-        -   Refactor regex in one function
         -   CallBackExecuteMove
 
 -   Done
@@ -65,5 +58,7 @@ The game is shared accross all components by using "context". The Drag and Drop 
     -   ~~Game over~~
     -   ~~Console~~
     -   ~~Undo move~~
+    -   ~~Undo Promotion & Castling~~
     -   ~~Save game in LocalStorage~~
     -   ~~Reset boards~~
+    -   ~~See other board's tile content in transparency~~

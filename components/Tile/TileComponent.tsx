@@ -88,7 +88,6 @@ export default function TileComponent({ square, callBackExecuteMove }: TileProps
     /**
      * Component rendering
      */
-
     let isOriginalTileOfDraggedPiece: boolean = false
     let isTileAPossiblePosition: boolean = false
     if (dragNDropState.piece !== null) {
@@ -102,6 +101,9 @@ export default function TileComponent({ square, callBackExecuteMove }: TileProps
 
     const coordinates: string = fromPositionToCoordinates(square.position)
     const isDraggedPieceAboveTile: boolean = dragNDropState.isDragging ? coordinates === dragNDropState.hoveredCoordinates : false
+    const oppositeTileHasAPiece: Piece | null = square.isOnMainBoard
+        ? game.secondBoard[square.position.row][square.position.column].piece
+        : game.board[square.position.row][square.position.column].piece
     const isKingUnderThreat: boolean = square.piece?.type === 'King' && square.isThreatenedByColor(!square.piece?.isWhite)
 
     let cssClasses: string = "relative before:w-full before:h-full before:absolute before:content-[''] before:pointer-events-none "
@@ -117,6 +119,9 @@ export default function TileComponent({ square, callBackExecuteMove }: TileProps
                 <div className={square.isOnMainBoard ? styles.mainBoard : styles.secondBoard} onDragStart={preventDrag}>
                     <Image className="preventSelect" data-coordinates={coordinates} src={'/board/' + tileImgPrefix + '-tile.png'} alt={tileImgPrefix + ' tile'} width="80" height="80" />
                 </div>
+                {square.piece === null && isDraggedPieceAboveTile && oppositeTileHasAPiece && (
+                    <Image className={'absolute top-0 opacity-25 preventSelect'} src={'/board/' + oppositeTileHasAPiece.img} alt={oppositeTileHasAPiece.type} width="100" height="100" />
+                )}
                 {square.piece !== null && <PieceComponent piece={square.piece} onDragStart={pieceDragStart} preventDrag={preventDrag} />}
             </div>
         </td>
