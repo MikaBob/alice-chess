@@ -1,10 +1,10 @@
-import Game, { BOARD_ROWS, REGEX_PARSE_MOVE, RegexParseMoveResult } from './Game'
 import { PIECE_TYPE_BISHOP, Bishop } from './Pieces/Bishop'
 import { PIECE_TYPE_KING, King } from './Pieces/King'
 import { PIECE_TYPE_KNIGHT, Knight } from './Pieces/Knight'
 import { PIECE_TYPE_PAWN, Pawn } from './Pieces/Pawn'
 import { PIECE_TYPE_QUEEN, Queen } from './Pieces/Queen'
 import { PIECE_TYPE_TOWER, Tower } from './Pieces/Tower'
+import Game, { BOARD_ROWS } from './Game'
 import Piece from './Pieces/Piece'
 
 export const COLUMN_NAME = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
@@ -103,8 +103,9 @@ export const getNewPieceFromShortName = (pieceShortName: string, isWhite: boolea
         case new King(isWhite).getShortName():
             return new King(isWhite)
         default:
-            return null
+            new Error(`There is no knowned piece with short name "${pieceShortName}".`)
     }
+    return null
 }
 
 /**

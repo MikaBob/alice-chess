@@ -2,6 +2,7 @@ import Game from '../Game'
 import Piece from './Piece'
 import Square from '../Square'
 
+export const KING_INITIAL_COLUMN = 4
 export const PIECE_TYPE_KING = 'King'
 
 export class King extends Piece {

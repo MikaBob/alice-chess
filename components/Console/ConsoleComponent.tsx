@@ -23,7 +23,7 @@ export default function ConsoleComponent({}: ConsoleProps) {
     return (
         <div className="secondPart">
             <h2 className="text-sm md:text-2xl font-bold underline mb-2">Console</h2>
-            <div>
+            <div className="h-52">
                 <div>
                     <h3 className="font-bold text-sm md:text-base m-2">{msg}</h3>
                     <button className={'bg-primary hover:bg-secondary p-3 rounded-md font-semibold'} onClick={undoMove}>
