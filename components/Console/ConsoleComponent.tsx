@@ -6,7 +6,14 @@ interface ConsoleProps {}
 
 export default function ConsoleComponent({}: ConsoleProps) {
     const { game, updateGame } = useGameContext()
-    const msg = game.isGameOver() ? 'Game Over' : (game.isWhiteTurnToPlay ? 'White' : 'Black') + "'s turn"
+    let msg = game.isWhiteTurnToPlay ? 'White' : 'Black'
+    if (game.isCheckmate()) {
+        msg = 'Checkmate. ' + msg + ' lost'
+    } else if (game.isPat()) {
+        msg = 'Pat. ' + msg + ' can not do any valid move'
+    } else {
+        msg += "'s turn"
+    }
 
     const undoMove = () => {
         game.cancelLastMove()

@@ -417,12 +417,11 @@ export default class Game {
     }
 
     /**
-     * Verify if there is no pat or checkmate
+     * Verify if the playing color can move at least one piece
      *
-     * @returns true if the game is over
+     * @returns true if the game is stalemate
      */
-    isGameOver(): boolean {
-        let isPat = true
+    isPat(): boolean {
         for (let i = 0; i < BOARD_ROWS; i++) {
             for (let j = 0; j < BOARD_COLUMNS; j++) {
                 let pieceOnMainBoard: Piece | null = this.board[i][j].piece
@@ -431,14 +430,41 @@ export default class Game {
                     (pieceOnMainBoard !== null && pieceOnMainBoard.isWhite === this.isWhiteTurnToPlay && pieceOnMainBoard.possibleMoves.length > 0) ||
                     (pieceOnSecondBoard !== null && pieceOnSecondBoard.isWhite === this.isWhiteTurnToPlay && pieceOnSecondBoard.possibleMoves.length > 0)
                 )
-                    isPat = false
+                    return false
             }
         }
-        /**
-         * @TODO
-         * checkmates
-         */
-        return isPat
+        return true
+    }
+
+    /**
+     * Verify if the playing color can prevent the check (when there is one)
+     *
+     * @returns true if the previous move was a checkmate
+     */
+    isCheckmate(): boolean {
+        if (!this.isKingUnderThreat()) return false
+
+        for (let i = 0; i < BOARD_ROWS; i++) {
+            for (let j = 0; j < BOARD_COLUMNS; j++) {
+                let pieceOnMainBoard: Piece | null = this.board[i][j].piece
+                let pieceOnSecondBoard: Piece | null = this.secondBoard[i][j].piece
+                if (pieceOnMainBoard !== null && pieceOnMainBoard.isWhite === this.isWhiteTurnToPlay && pieceOnMainBoard.possibleMoves.length > 0) {
+                    pieceOnMainBoard.possibleMoves.forEach((possiblePosition: Position) => {
+                        if (this.verifyMove(pieceOnMainBoard, possiblePosition)) {
+                            return false
+                        }
+                    })
+                }
+                if (pieceOnSecondBoard !== null && pieceOnSecondBoard.isWhite === this.isWhiteTurnToPlay && pieceOnSecondBoard.possibleMoves.length > 0) {
+                    pieceOnSecondBoard.possibleMoves.forEach((possiblePosition: Position) => {
+                        if (this.verifyMove(pieceOnSecondBoard, possiblePosition)) {
+                            return false
+                        }
+                    })
+                }
+            }
+        }
+        return true
     }
 
     /**
@@ -459,7 +485,7 @@ export default class Game {
                 return getNewPieceFromShortName(parsedMove.promotion !== null ? parsedMove.promotion.getShortName() : parsedMove.piece.getShortName(), isWhite)
             }
         }
-        return Game.getPieceOnInitialPositon(square.position) // It could be a piece that has not moved yet
+        return Game.getInitialPieceOfPositon(square.position) // It could be a piece that has not moved yet
     }
 
     /**
@@ -568,7 +594,12 @@ export default class Game {
         }
     }
 
-    static getPieceOnInitialPositon(initialPosition: Position): Piece | null {
+    /**
+     * Return the intial piece from the given positon (or null)
+     * @param initialPosition positon we want to retrieve the piece from
+     * @returns the piece that was there before the first move (or null)
+     */
+    static getInitialPieceOfPositon(initialPosition: Position): Piece | null {
         const tmpGame = new Game()
         tmpGame.initChessSet()
         return tmpGame.board[initialPosition.row][initialPosition.column].piece
