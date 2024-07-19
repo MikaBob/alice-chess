@@ -3,6 +3,7 @@ import { useGameContext } from '@/context/GameContext'
 import Square from '@/src/Square'
 import TileComponent from '../Tile/TileComponent'
 import { COLUMN_NAME } from '@/src/Utils'
+import { BUTTON_TOGGLE_BOARDS_ATTRIBUTE_ROTATES, BUTTON_TOGGLE_BOARDS_ID } from '../Console/ConsoleComponent'
 
 interface BoardProps {
     isMainBoard?: boolean
@@ -11,7 +12,19 @@ interface BoardProps {
 
 export default function BoardComponent({ isMainBoard, callBackExecuteMove }: BoardProps) {
     const { game } = useGameContext()
-    const board = isMainBoard ? game.board : game.secondBoard
+    const shallowGame = game.cloneGame()
+    const columnNames = [...COLUMN_NAME]
+    const board = isMainBoard ? shallowGame.board : shallowGame.secondBoard
+
+    let shouldRotateBoards = null
+    if (typeof document !== 'undefined') {
+        shouldRotateBoards = document.getElementById(BUTTON_TOGGLE_BOARDS_ID)?.hasAttribute(BUTTON_TOGGLE_BOARDS_ATTRIBUTE_ROTATES)
+        if (shouldRotateBoards) {
+            board.reverse()
+            columnNames.reverse()
+        }
+    }
+
     return (
         <div className={isMainBoard ? 'firstPart' : 'secondPart basis-1/3'}>
             <table className={'border-2 border-black ' + (isMainBoard ? 'float-left' : 'float-right')}>
@@ -23,13 +36,13 @@ export default function BoardComponent({ isMainBoard, callBackExecuteMove }: Boa
                                     return <TileComponent key={colunmIndex} square={square} callBackExecuteMove={callBackExecuteMove} />
                                 })}
                                 <td key={rowIndex} className="border-2 border-black text-center px-2">
-                                    {8 - rowIndex}
+                                    {shouldRotateBoards ? 8 - rowIndex : 1 + rowIndex}
                                 </td>
                             </tr>
                         )
                     })}
                     <tr>
-                        {COLUMN_NAME.map((columnLetter: string, colunmIndex: number) => {
+                        {columnNames.map((columnLetter: string, colunmIndex: number) => {
                             return (
                                 <td key={colunmIndex} className="border-2 border-black text-center">
                                     {columnLetter}
