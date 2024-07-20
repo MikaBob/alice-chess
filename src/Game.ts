@@ -2,7 +2,7 @@ import { Bishop } from './Pieces/Bishop'
 import { fromPositionToCoordinates, Position, isPositionInList, getNewPieceFromShortName, getNewPieceFromName, fromCoordinatesToPosition } from './Utils'
 import { KING_INITIAL_COLUMN, King, PIECE_TYPE_KING } from './Pieces/King'
 import { Knight } from './Pieces/Knight'
-import { PAWN_INITIAL_ROW_BLACK, PAWN_INITIAL_ROW_WHITE, Pawn } from './Pieces/Pawn'
+import { PAWN_INITIAL_ROW_BLACK, PAWN_INITIAL_ROW_WHITE, PIECE_TYPE_PAWN, Pawn } from './Pieces/Pawn'
 import { PIECE_TYPE_TOWER, Tower } from './Pieces/Tower'
 import { Queen } from './Pieces/Queen'
 import Piece from './Pieces/Piece'
@@ -12,7 +12,8 @@ const MAIN_BOARD_SHORT_NAME = 'M'
 const SECOND_BOARD_SHORT_NAME = 'S'
 const BIG_CASTLING_SHORT_NAME = 'O-O-O'
 const SMALL_CASTLING_SHORT_NAME = 'O-O'
-const REGEX_PARSE_MOVE: RegExp = /^(?<board>M|S)(?<piece>K|N|Q|R|B)?(?<from>[a-h][1-8])(?<action>-|x)(?<to>[a-h][1-8])=?(?<promotion>N|Q|R|B)?$/
+const EN_PASSANT_SHORT_NAME = ' e.p.'
+const REGEX_PARSE_MOVE: RegExp = /^(?<board>M|S)(?<piece>K|N|Q|R|B)?(?<from>[a-h][1-8])(?<action>-|x)(?<to>[a-h][1-8])=?(?<promotion>N|Q|R|B)?(?<enPassant> e.p.)?$/
 
 type RegexParseMoveResult = {
     action: string | undefined
@@ -21,6 +22,7 @@ type RegexParseMoveResult = {
     piece: string | undefined
     promotion: string | undefined
     to: string | undefined
+    enPassant: string | boolean | undefined
 }
 
 export type ParsedMoveFromMoveList = {
@@ -33,6 +35,7 @@ export type ParsedMoveFromMoveList = {
     piece: Piece
     promotion: Piece | null
     to: Position
+    isEnPassant: boolean
 }
 
 export const BOARD_COLUMNS = 8
@@ -104,6 +107,7 @@ export default class Game {
 
         this.calculateThreats()
         this.addCastlingAsPossibleMoves() // In case we change the set, we could castle at the 1st turn
+        this.addEnPassantAsPossibleMoves() // same as above
     }
 
     /**
@@ -144,6 +148,8 @@ export default class Game {
             (this.board[positionTo.row][positionTo.column].piece !== null || this.secondBoard[positionTo.row][positionTo.column].piece !== null ? 'x' : '-') +
             fromPositionToCoordinates(positionTo).toLowerCase()
         const initialPiecePostion: Position = pieceToMove.position
+
+        // Move the piece and eat
         if (pieceToMove.isOnMainBoard) {
             this.board[pieceToMove.position.row][pieceToMove.position.column].setPieceOnSquare(null) // empty square where it currently stands
             this.board[positionTo.row][positionTo.column].setPieceOnSquare(null) // empty square  where it will go
@@ -153,6 +159,23 @@ export default class Game {
             this.secondBoard[positionTo.row][positionTo.column].setPieceOnSquare(null) // empty square where it will go
             this.board[positionTo.row][positionTo.column].setPieceOnSquare(pieceToMove) // move piece on the other board
             boardName = SECOND_BOARD_SHORT_NAME
+        }
+
+        // for en passant, must eat the pawn behind him
+        if (pieceToMove.type === PIECE_TYPE_PAWN && this.moveList.length > 0) {
+            const lastMoveParsed: ParsedMoveFromMoveList = this.parseMoveFromMoveList(this.moveList, this.moveList.length - 1)
+            // If last move was a pawn moving 2 squares, that ended next to us
+            if (
+                lastMoveParsed.piece.type === PIECE_TYPE_PAWN &&
+                Math.abs(lastMoveParsed.from.row - lastMoveParsed.to.row) === 2 &&
+                lastMoveParsed.to.row == initialPiecePostion.row &&
+                Math.abs(lastMoveParsed.to.column - initialPiecePostion.column) === 1
+            ) {
+                const eatingDirection = positionTo.column - initialPiecePostion.column
+                if (lastMoveParsed.initiatedOnMainBoard) this.secondBoard[initialPiecePostion.row][initialPiecePostion.column + eatingDirection].setPieceOnSquare(null)
+                else this.board[initialPiecePostion.row][initialPiecePostion.column + eatingDirection].setPieceOnSquare(null)
+                moveName = pieceToMove.getShortName() + fromPositionToCoordinates(initialPiecePostion).toLowerCase() + 'x' + fromPositionToCoordinates(positionTo).toLowerCase() + EN_PASSANT_SHORT_NAME
+            }
         }
 
         // for castling, move also the tower
@@ -167,6 +190,7 @@ export default class Game {
                 moveName = isBigCastle ? BIG_CASTLING_SHORT_NAME : SMALL_CASTLING_SHORT_NAME
             }
         }
+
         this.moveList.push([BIG_CASTLING_SHORT_NAME, SMALL_CASTLING_SHORT_NAME].indexOf(moveName) < 0 ? boardName + moveName : moveName) // write history
         this.isWhiteTurnToPlay = !this.isWhiteTurnToPlay
     }
@@ -190,7 +214,7 @@ export default class Game {
                 if (this.secondBoard[i][j].piece !== null && this.secondBoard[i][j].piece?.type !== PIECE_TYPE_KING) this.secondBoard[i][j].piece?.calculatePossibleMoves(this)
             }
         }
-        this.calculateKingsMoves()
+        this.calculateSpecialMoves()
     }
 
     /**
@@ -225,10 +249,12 @@ export default class Game {
 
     /**
      * Kings movement are the only one that can not move on a threatened square
+     * Castling and En passant are special moves that requires several conditions
      */
-    calculateKingsMoves(): void {
+    calculateSpecialMoves(): void {
         this.getKingOfColor(this.isWhiteTurnToPlay)?.calculatePossibleMoves(this) // re-calculate after calculating threats to prevent showing kings move to threaten squares
         this.addCastlingAsPossibleMoves()
+        this.addEnPassantAsPossibleMoves()
     }
 
     /**
@@ -307,6 +333,37 @@ export default class Game {
     }
 
     /**
+     * En Passant is a capturing move for Pawns that requires some specific conditions
+     *
+     * - The captured pawn must have moved two squares in one move, landing right next to the capturing pawn
+     * - The capturing pawn must have advanced exactly three ranks to perform this move
+     * - The "en passant" capture must be performed on the turn immediately after the pawn being captured moves
+     *
+     * This move can be performed on both boards
+     */
+    addEnPassantAsPossibleMoves(): void {
+        if (this.moveList.length < 1) return
+        const squaresToCheck = this.isWhiteTurnToPlay ? [...this.board[3], ...this.secondBoard[3]] : [...this.board[4], ...this.secondBoard[4]]
+        squaresToCheck.map((squareToCheck: Square) => {
+            if (squareToCheck.piece && squareToCheck.piece.isWhite === this.isWhiteTurnToPlay) {
+                const lastMoveParsed: ParsedMoveFromMoveList = this.parseMoveFromMoveList(this.moveList, this.moveList.length - 1)
+
+                // Moves that are not from a pawn move 2 squares
+                if (lastMoveParsed.piece.type !== PIECE_TYPE_PAWN || Math.abs(lastMoveParsed.from.row - lastMoveParsed.to.row) !== 2) return
+
+                if (lastMoveParsed.to.row == squareToCheck.position.row && Math.abs(lastMoveParsed.to.column - squareToCheck.position.column) === 1) {
+                    const directionToEat = this.isWhiteTurnToPlay ? -1 : 1
+                    squareToCheck.piece.addSquareToPossibleMoveAndReturnTrueIfSquareNotEmpty(
+                        squareToCheck.isOnMainBoard
+                            ? this.board[lastMoveParsed.to.row + directionToEat][lastMoveParsed.to.column]
+                            : this.secondBoard[lastMoveParsed.to.row + directionToEat][lastMoveParsed.to.column],
+                    )
+                }
+            }
+        })
+    }
+
+    /**
      * Retrieve the king of the desired color
      *
      * @param ofColorWhite true if the expected color is white
@@ -352,9 +409,7 @@ export default class Game {
         if (this.moveList.length < 1) return
 
         const lastMoveParsed: ParsedMoveFromMoveList = this.parseMoveFromMoveList(this.moveList, this.moveList.length - 1)
-        const pieceThatWasEaten: Piece | null = lastMoveParsed.isEatingAPiece
-            ? this.getLastPieceThatWasOnSquare(this.board[lastMoveParsed.to.row][lastMoveParsed.to.column], this.isWhiteTurnToPlay)
-            : null
+        const pieceThatWasEaten: Piece | null = lastMoveParsed.isEatingAPiece ? this.getLastPieceThatWasOnSquare(this.board[lastMoveParsed.to.row][lastMoveParsed.to.column]) : null
 
         if (lastMoveParsed.initiatedOnMainBoard) {
             this.board[lastMoveParsed.from.row][lastMoveParsed.from.column].setPieceOnSquare(lastMoveParsed.piece)
@@ -378,13 +433,14 @@ export default class Game {
             }
         }
 
+        // for en passant, respawn the eaten pawn
+        if (lastMoveParsed.isEnPassant) {
+            this.secondBoard[lastMoveParsed.from.row][lastMoveParsed.to.column].setPieceOnSquare(getNewPieceFromName(PIECE_TYPE_PAWN, !lastMoveParsed.piece.isWhite))
+        }
+
         this.moveList.pop()
-        this.calculateThreats()
         this.isWhiteTurnToPlay = !this.isWhiteTurnToPlay
-        /* 
-        @TODO
-            Undo castlings
-        */
+        this.calculateThreats()
     }
 
     /**
@@ -472,17 +528,24 @@ export default class Game {
      * has been lastly on the given square
      * by browsing the move list in reverse
      *
+     * Whatever the board, a piece that move is
+     * technically on both boards all the time
+     *
      * @param square
      * @param isWhite
      * @returns the last piece eaten on the square, or null
      */
-    getLastPieceThatWasOnSquare(square: Square, isWhite: boolean): Piece | null {
+    getLastPieceThatWasOnSquare(square: Square): Piece | null {
         const moveListInReverse: string[] = this.moveList.toReversed()
         moveListInReverse.shift() // remove last move
         for (let i = 0; i < moveListInReverse.length; i++) {
             const parsedMove: ParsedMoveFromMoveList = this.parseMoveFromMoveList(moveListInReverse, i)
             if (square.position.row === parsedMove.to.row && square.position.column === parsedMove.to.column) {
-                return getNewPieceFromShortName(parsedMove.promotion !== null ? parsedMove.promotion.getShortName() : parsedMove.piece.getShortName(), isWhite)
+                const pieceThatWasOnSquare = getNewPieceFromShortName(parsedMove.promotion !== null ? parsedMove.promotion.getShortName() : parsedMove.piece.getShortName(), !parsedMove.piece.isWhite)
+                if (pieceThatWasOnSquare) {
+                    pieceThatWasOnSquare.position = square.position
+                }
+                return pieceThatWasOnSquare
             }
         }
         return Game.getInitialPieceOfPositon(square.position) // It could be a piece that has not moved yet
@@ -533,11 +596,12 @@ export default class Game {
                 piece: kingThatMoves,
                 promotion: null,
                 to: { row: kingThatMoves.position.row, column: hasHappenedAlready ? kingThatMoves.position.column : KING_INITIAL_COLUMN + (move === BIG_CASTLING_SHORT_NAME ? -2 : 2) },
+                isEnPassant: false,
             }
         }
 
         // parsing with normal moves
-        const { board, piece, from, action, to, promotion } = REGEX_PARSE_MOVE.exec(move)?.groups as RegexParseMoveResult
+        const { board, piece, from, action, to, promotion, enPassant } = REGEX_PARSE_MOVE.exec(move)?.groups as RegexParseMoveResult
         const pieceNameThatMove: string = piece ?? '' // it's a pawn by default
         if (board === undefined) throw new Error(`Could not parse move ${move}.`)
 
@@ -591,6 +655,7 @@ export default class Game {
             piece: pieceThatMoves,
             promotion: replacement,
             to: finalPosition,
+            isEnPassant: enPassant === EN_PASSANT_SHORT_NAME,
         }
     }
 

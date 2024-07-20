@@ -37,14 +37,14 @@ The game is shared accross all components by using "context". The Drag and Drop 
 -   To do
 
     -   Animate moves
-    -   Turn boards upside down
-    -   En passant & Undo en passant
     -   Refactoring
         -   Interfaces for Pieces
         -   CallBackExecuteMove
     -   Online Multiplayer
 
 -   Done
+    -   ~~Turn boards upside down~~
+    -   ~~En passant & Undo en passant~~
     -   ~~Detect checkmates~~
     -   ~~Display 1st boards with pieces~~
     -   ~~Drag and drop pieces~~
