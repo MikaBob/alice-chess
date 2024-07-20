@@ -43,9 +43,6 @@ The game is shared accross all components by using "context". The Drag and Drop 
     -   Online Multiplayer
 
 -   Done
-    -   ~~Turn boards upside down~~
-    -   ~~En passant & Undo en passant~~
-    -   ~~Detect checkmates~~
     -   ~~Display 1st boards with pieces~~
     -   ~~Drag and drop pieces~~
     -   ~~Eat pieces on drop~~
@@ -63,3 +60,6 @@ The game is shared accross all components by using "context". The Drag and Drop 
     -   ~~Save game in LocalStorage~~
     -   ~~Reset boards~~
     -   ~~See other board's tile content in transparency~~
+    -   ~~Detect checkmates~~
+    -   ~~En passant & Undo en passant~~
+    -   ~~Turn boards upside down~~

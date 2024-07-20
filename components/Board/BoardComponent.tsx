@@ -16,9 +16,9 @@ export default function BoardComponent({ isMainBoard, callBackExecuteMove }: Boa
     const columnNames = [...COLUMN_NAME]
     const board = isMainBoard ? shallowGame.board : shallowGame.secondBoard
 
-    let shouldRotateBoards = null
+    let shouldRotateBoards = false
     if (typeof document !== 'undefined') {
-        shouldRotateBoards = document.getElementById(BUTTON_TOGGLE_BOARDS_ID)?.hasAttribute(BUTTON_TOGGLE_BOARDS_ATTRIBUTE_ROTATES)
+        shouldRotateBoards = document.getElementById(BUTTON_TOGGLE_BOARDS_ID)?.hasAttribute(BUTTON_TOGGLE_BOARDS_ATTRIBUTE_ROTATES) ?? false
         if (shouldRotateBoards) {
             board.reverse()
             columnNames.reverse()
