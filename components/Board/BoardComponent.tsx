@@ -3,7 +3,7 @@ import { useGameContext } from '@/context/GameContext'
 import Square from '@/src/Square'
 import TileComponent from '../Tile/TileComponent'
 import { COLUMN_NAME } from '@/src/Utils'
-import { BUTTON_TOGGLE_BOARDS_ATTRIBUTE_ROTATES, BUTTON_TOGGLE_BOARDS_ID } from '../Console/ConsoleComponent'
+import { BUTTON_TOGGLE_BOARDS_ATTRIBUTE_ROTATES, BUTTON_TOGGLE_ROTATE_BOARDS_ID } from '../Console/ConsoleComponent'
 
 interface BoardProps {
     isMainBoard?: boolean
@@ -18,7 +18,7 @@ export default function BoardComponent({ isMainBoard, callBackExecuteMove }: Boa
 
     let shouldRotateBoards = false
     if (typeof document !== 'undefined') {
-        shouldRotateBoards = document.getElementById(BUTTON_TOGGLE_BOARDS_ID)?.hasAttribute(BUTTON_TOGGLE_BOARDS_ATTRIBUTE_ROTATES) ?? false
+        shouldRotateBoards = document.getElementById(BUTTON_TOGGLE_ROTATE_BOARDS_ID)?.hasAttribute(BUTTON_TOGGLE_BOARDS_ATTRIBUTE_ROTATES) ?? false
         if (shouldRotateBoards) {
             board.reverse()
             columnNames.reverse()

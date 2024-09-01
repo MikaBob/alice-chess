@@ -21,13 +21,12 @@ export default function IntroductionComponent({}: IntroductionProps) {
             </div>
             <div className="secondPart">
                 <h2 className="text-sm md:text-2xl font-bold underline mb-2">Gameplay</h2>
-                <p>
-                    When dragging a piece, green tiles are the possible moves.
-                    <br /> The purple tile is where you are currently aiming. <br />
-                    You can drag from one board and drop at the other board
-                    <br />
-                    If you can not make a move; either it is not your turn, or the move is not possible.
-                </p>
+                <ul className="list-disc">
+                    <li>When dragging a piece, green tiles are the possible moves.</li>
+                    <li>The purple tile is where you are currently aiming.</li>
+                    <li>You can drag from one board and drop at the other board.</li>
+                    <li>If you can not make a move; either it is not your turn, or the move is not possible.</li>
+                </ul>
             </div>
         </div>
     )

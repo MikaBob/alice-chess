@@ -3,7 +3,7 @@ import { Position, loadMoveListFromLS, saveMoveListInLS } from '@/src/Utils'
 import { useGameContext } from '@/context/GameContext'
 import { useEffect, useState } from 'react'
 import BoardComponent from '@/components/Board/BoardComponent'
-import ConsoleComponent from '@/components/Console/ConsoleComponent'
+import ConsoleComponent, { BUTTON_TOGGLE_AUTO_ROTATE_ID, BUTTON_TOGGLE_BOARDS_ATTRIBUTE_ROTATES, BUTTON_TOGGLE_ROTATE_BOARDS_ID } from '@/components/Console/ConsoleComponent'
 import Head from 'next/head'
 import IntroductionComponent from '@/components/Introduction/IntroductionComponent'
 import ModalPromotionComponent, { ModalPromotionParametersType } from '@/components/ModalPromotion/ModalPromotionComponent'
@@ -37,6 +37,10 @@ export default function Home({}: HomeProps) {
             game.executeMove(pieceToMove, newPosition)
             game.calculateThreats()
             saveMoveListInLS(game.moveList)
+            if (document.getElementById(BUTTON_TOGGLE_AUTO_ROTATE_ID)?.hasAttribute(BUTTON_TOGGLE_AUTO_ROTATE_ID) ?? false) {
+                document.getElementById(BUTTON_TOGGLE_ROTATE_BOARDS_ID)?.toggleAttribute(BUTTON_TOGGLE_BOARDS_ATTRIBUTE_ROTATES)
+                updateGame(game)
+            }
         }
     }
 
